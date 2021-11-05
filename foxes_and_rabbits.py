@@ -8,45 +8,44 @@ start_menu = ['Display parameters', 'Quick setup', 'Advanced setup', 'Run', 'Qui
 advanced_menu = ['World', 'Rabbit population', 'Fox population', 'Execution', 'Done/Go back']
 reporting_menu = ['Print summary', 'Plot pop. size / time', 'Plot lifespan', 'Plot energy', 'Plot kills distrubution', 'Plot all', 'Quit']
 
-#Setting up dynamic strings
-advanced_params = """
-Advanced parameters:
-
+#Setting up dynamic strings -- note that these in entirety should be in a .json file and parsed.
+#Forgot if .json files use "" or '', but we'll figure it out by testing.
+advanced_params = """ADVANCED PARAMETERS:
 [World]
 Shape ('toroid'/'island'): {}
-North/South length (height, positive): {}
-West/East length (width, positive): {}
+North/South length (height, positive int): {}
+West/East length (width, positive int): {}
 
 [Fox]
-Initial size: {}
-Metabolism (energy/step): {}
-Maximum energy: {}
-Maximum age: {}
-Mating probability: {}
-Minimum mating energy: {}
-Minimum mating age: {}
+Initial size (positive int): {}
+Metabolism (energy/step, positive int): {}
+Maximum energy (positive int): {}
+Maximum age (positive int): {}
+Mating probability (float between 0 and 1): {}
+Minimum mating energy (positive int): {}
+Minimum mating age (positive int): {}
 
 [Rabbit]
-Initial size: {}
-Metabolism (energy/step): {}
-Maximum energy: {}
-Maximum age: {}
-Mating probability: {}
-Minimum mating energy: {}
-Minimum mating age: {}
+Initial size(positive int): {}
+Metabolism (energy/step, positive int): {}
+Maximum energy (positive int): {}
+Maximum age (positive int): {}
+Mating probability (float between 0 and 1): {}
+Minimum mating energy (positive int): {}
+Minimum mating age (positive int): {}
 
 [Simulation]
-Duration: {}
-Step delay (seconds): {}
-Visuals: {}
+Duration/iterations/steps (positive int): {}
+Step delay (seconds, positive float): {}
+Visuals (True/False): {}
 """
 
-quick_params = """
-World height (North/South length): {}
-World width (East/West length): {}
-Initial fox pop size: {}
-Initial rabbit pop size: {}
-Simulation model: {}
+quick_params = """QUICK PARAMETERS:
+North/South length (height, positive int): {}
+West/East length (width, positive int): {}
+[Fox] Initial size (positive int): {}
+[Rabbit] Initial size (positive int): {}
+Visuals (True/False): {}
 """
 
 def menu(menu_list: typing.List[str]) -> int:
@@ -54,82 +53,85 @@ def menu(menu_list: typing.List[str]) -> int:
     Prints a list of options which the user can choose as input given a list.
     Precondition: menu_list is a list of strings.
     """
-    state = 0 # Initialize variable
+    state = -1 # Initialize variable
     
     viable_states = range(len(menu_list)) # Get viable states from the menu
        
-    while state - 1 not in viable_states: # state - 1, since all states range from 1 to len(menu_list) + 1
+    while state not in viable_states:
         print("Action selection:")
         for option in viable_states:
             print(str(option + 1) + '.', menu_list[option])
-        state = input("Awaiting input: ").replace('.', '')
+        state = input("Awaiting input: ").capitalize().replace('.', '')
+        print()
         try:
-            state = int(state)
-            if state - 1 in viable_states:
-                return state
+            state = int(state) - 1
+            if state in viable_states:
+                return menu_list[state]
         except (ValueError, TypeError):
-            state = 0
+            if state in menu_list:
+                return state
+            state = -1
         
-        input("\nInput must be an integer, please try again (hit enter).\n")
+        input("Invalid input, please try again (hit enter).\n")
 
-state = 0 # Default state, only assigned manually, cannot be user input
+state = -1 # Default state, only assigned manually, cannot be user input
 
 while True:
-  if state not in range(1, 1 + len(start_menu)):
-    with open('parameters.csv') as parameters:
+  if state not in start_menu:
+    with open('parameters.json') as parameters:
       pass
     print(quick_params)
   state = menu(start_menu)
 
-  if state == 1: #Display parameters
-    with open('parameters.csv') as parameters:
+  if state == start_menu[0]: #Display parameters
+    with open('parameters.json') as parameters:
       pass
     print(advanced_params)
 
-  if state == 2: #Quick setup
-    with open('parameters.csv', mode='w') as parameters:
+  if state == start_menu[1]: #Quick setup
+    with open('parameters.json') as parameters:
       pass
-    state = 0
+    state = -1
 
-  if state == 3: #Advanced setup
-    with open('parameters.csv', mode='w') as parameters:
+  if state == start_menu[2]: #Advanced setup
+    with open('parameters.json') as parameters:
       pass
+    
     while True:
-        state = menu(advanced_menu)
-        if state == 1: #World
-          pass
-        if state == 2: #Rabbit population
-          pass
-        if state == 3: #Fox population
-          pass
-        if state == 4: #Execution
-          pass
-        if state == 5: #Done/go back
-          state = 0
-          break
+      state = menu(advanced_menu)
+      if state == advanced_menu[0]: #World
+        pass
+      if state == advanced_menu[1]: #Rabbit population:
+        pass
+      if state == advanced_menu[2]: #Fox population:
+        pass
+      if state == advanced_menu[3]: #Execution:
+        pass
+      if state == advanced_menu[4]: #Done/go back:
+        state = -1
+        break
 
-  if state == 4: #Run
-    with open('parameters.csv') as parameters:
+  if state == start_menu[3]: #Run
+    with open('parameters.json') as parameters:
       pass
         
     while True:
       state = menu(reporting_menu)
             
-      if state == 1: #Print summary
+      if state == reporting_menu[0]: #Print summary
         pass
-      if state == 2: #Plot pop. siz e/ time
+      if state == reporting_menu[1]: #Plot pop. siz e/ time
         pass
-      if state == 3: #Plot lifespan
+      if state == reporting_menu[2]: #Plot lifespan
         pass
-      if state == 4: #Plot energy
+      if state == reporting_menu[3]: #Plot energy
         pass
-      if state == 5: #Plot kills distribution
+      if state == reporting_menu[4]: #Plot kills distribution
         pass
-      if state == 6: #Plot all
+      if state == reporting_menu[5]: #Plot all
         pass            
-      if state == 7: #Quit
-        state = 5
-        break
+      if state == reporting_menu[6]: #Quit
+        break #Note that reporting_menu[6] == start_menu[4]
   
-  if state == 5: #Quit
-    break
+  if state == start_menu[4]: #Quit
+    break #Note that reporting_menu[6] == start_menu[4] == "Quit"
