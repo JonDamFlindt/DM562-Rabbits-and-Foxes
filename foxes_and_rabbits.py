@@ -53,7 +53,7 @@ def menu(menu_list: typing.List[str]) -> int:
     Prints a list of options which the user can choose as input given a list.
     Precondition: menu_list is a list of strings.
     """
-    state = -1 # Initialize variable
+    state = None # Initialize variable
     
     viable_states = range(len(menu_list)) # Get viable states from the menu
        
@@ -70,13 +70,13 @@ def menu(menu_list: typing.List[str]) -> int:
         except (ValueError, TypeError):
             if state in menu_list:
                 return state
-            state = -1
+            state = None
         
         input("Invalid input, please try again (hit enter).\n")
 
-state = -1 # Default state, only assigned manually, cannot be user input
+state = None # Default state
 
-while True:
+while state != start_menu[-1]: # As long as not "Quit"
   if state not in start_menu:
     with open('parameters.json') as parameters:
       pass
@@ -94,10 +94,10 @@ while True:
     state = -1
 
   if state == start_menu[2]: #Advanced setup
-    with open('parameters.json') as parameters:
-      pass
-    
-    while True:
+    while state != advanced_menu[-1]: # As long as not "Done/go back"
+      with open('parameters.json') as parameters:
+        pass
+
       state = menu(advanced_menu)
       if state == advanced_menu[0]: #World
         pass
@@ -107,20 +107,17 @@ while True:
         pass
       if state == advanced_menu[3]: #Execution:
         pass
-      if state == advanced_menu[4]: #Done/go back:
-        state = -1
-        break
 
   if state == start_menu[3]: #Run
     with open('parameters.json') as parameters:
       pass
         
-    while True:
+    while state != reporting_menu[-1]: # As long as not "Quit"
       state = menu(reporting_menu)
-            
+      
       if state == reporting_menu[0]: #Print summary
         pass
-      if state == reporting_menu[1]: #Plot pop. siz e/ time
+      if state == reporting_menu[1]: #Plot pop. size / time
         pass
       if state == reporting_menu[2]: #Plot lifespan
         pass
@@ -130,8 +127,3 @@ while True:
         pass
       if state == reporting_menu[5]: #Plot all
         pass            
-      if state == reporting_menu[6]: #Quit
-        break #Note that reporting_menu[6] == start_menu[4]
-  
-  if state == start_menu[4]: #Quit
-    break #Note that reporting_menu[6] == start_menu[4] == "Quit"
