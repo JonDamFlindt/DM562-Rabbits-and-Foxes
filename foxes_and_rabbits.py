@@ -29,20 +29,24 @@ def menu(menu_list: typing.List[str]) -> int:
        
     while state not in viable_states:
         print("Action selection:")
-        for option in viable_states:
+        for option in viable_states: # Prints all menu options
             print(str(option + 1) + '.', menu_list[option])
-        state = input("Awaiting input: ").capitalize().replace('.', '')
+        
+        state = input("Awaiting input: ").replace('.', '').split(' ')
+        state = ' '.join([word for word in state if word != '']).capitalize()
+        # Above handles any extra spaces the user may insert into the input.
+        
         print()
         try:
-            state = int(state) - 1
+            state = int(state) - 1 # Raises ValueError if state is not int
             if state in viable_states:
                 return menu_list[state]
-        except (ValueError, TypeError):
+        except ValueError: # Checks if state is string in menu
             if state in menu_list:
                 return state
             state = None
         
-        input("Invalid input, please try again (hit enter).\n")
+        input("Invalid input, please try again (hit enter).\n") # Only printed if invalid state
 
 state = None # Default state
 
