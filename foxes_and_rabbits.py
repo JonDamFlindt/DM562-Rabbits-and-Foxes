@@ -2,7 +2,7 @@ import parameters as param
 import simulation as sim
 import reporting as report
 import typing
-import csv
+import json
 # Setting up menus
 start_menu = ['Display parameters', 'Quick setup', 'Advanced setup', 'Run', 'Quit']
 advanced_menu = ['World', 'Rabbit population', 'Fox population', 'Execution', 'Done']
