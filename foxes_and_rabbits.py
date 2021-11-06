@@ -70,7 +70,6 @@ while state != start_menu[-1]: # As long as not "Quit"
   if state == start_menu[1]: #Quick setup
     with open(config_file) as parameters:
       pass
-    state = -1
 
   if state == start_menu[2]: #Advanced setup
     while state != advanced_menu[-1]: # As long as not "Done/go back"
