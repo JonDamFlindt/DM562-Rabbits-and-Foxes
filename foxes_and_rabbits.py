@@ -5,40 +5,10 @@ import typing
 import csv
 # Setting up menus
 start_menu = ['Display parameters', 'Quick setup', 'Advanced setup', 'Run', 'Quit']
-advanced_menu = ['World', 'Rabbit population', 'Fox population', 'Execution', 'Done/Go back']
+advanced_menu = ['World', 'Rabbit population', 'Fox population', 'Execution', 'Done']
 reporting_menu = ['Print summary', 'Plot pop. size / time', 'Plot lifespan', 'Plot energy', 'Plot kills distrubution', 'Plot all', 'Quit']
 
-#Setting up dynamic strings -- note that these in entirety should be in a .json file and parsed.
-#Forgot if .json files use "" or '', but we'll figure it out by testing.
-advanced_params = """ADVANCED PARAMETERS:
-[World]
-Shape ('toroid'/'island'): {}
-North/South length (height, positive int): {}
-West/East length (width, positive int): {}
-
-[Fox]
-Initial size (positive int): {}
-Metabolism (energy/step, positive int): {}
-Maximum energy (positive int): {}
-Maximum age (positive int): {}
-Mating probability (float between 0 and 1): {}
-Minimum mating energy (positive int): {}
-Minimum mating age (positive int): {}
-
-[Rabbit]
-Initial size(positive int): {}
-Metabolism (energy/step, positive int): {}
-Maximum energy (positive int): {}
-Maximum age (positive int): {}
-Mating probability (float between 0 and 1): {}
-Minimum mating energy (positive int): {}
-Minimum mating age (positive int): {}
-
-[Simulation]
-Duration/iterations/steps (positive int): {}
-Step delay (seconds, positive float): {}
-Visuals (True/False): {}
-"""
+config_file = 'parameters.json'
 
 quick_params = """QUICK PARAMETERS:
 North/South length (height, positive int): {}
@@ -78,24 +48,29 @@ state = None # Default state
 
 while state != start_menu[-1]: # As long as not "Quit"
   if state not in start_menu:
-    with open('parameters.json') as parameters:
+    with open(config_file) as file:
       pass
     print(quick_params)
   state = menu(start_menu)
 
   if state == start_menu[0]: #Display parameters
-    with open('parameters.json') as parameters:
-      pass
-    print(advanced_params)
+    with open(config_file) as file:
+      parameters = json.load(file)
+    for category in parameters:
+      print(f'[{category}]')
+      for setting in parameters[category]:
+        print(f'{setting}: {parameters[category][setting]}')
+      print()
+
 
   if state == start_menu[1]: #Quick setup
-    with open('parameters.json') as parameters:
+    with open(config_file) as parameters:
       pass
     state = -1
 
   if state == start_menu[2]: #Advanced setup
     while state != advanced_menu[-1]: # As long as not "Done/go back"
-      with open('parameters.json') as parameters:
+      with open(config_file) as parameters:
         pass
 
       state = menu(advanced_menu)
@@ -109,7 +84,7 @@ while state != start_menu[-1]: # As long as not "Quit"
         pass
 
   if state == start_menu[3]: #Run
-    with open('parameters.json') as parameters:
+    with open(config_file) as parameters:
       pass
         
     while state != reporting_menu[-1]: # As long as not "Quit"
