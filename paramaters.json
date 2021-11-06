@@ -2,7 +2,7 @@
     "World": {
         "Shape (\"toroid\"/\"island\")": "island",
         "North/South length (height, positive int)": 10,
-        "West/East length (width, positive int)": 10
+        "East/West length (width, positive int)": 10
     },
     "Fox": {
         "Initial size (positive int)": 1,
@@ -24,7 +24,7 @@
     },
     "Simulation": {
         "Duration/iterations/steps (positive int)": 20,
-        "Step delay (seconds, positive float)": 0,
+        "Step delay (seconds, positive float)": 0.125,
         "Visuals (True/False)": true
     }
 }
