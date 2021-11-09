@@ -18,7 +18,7 @@ West/East length (width, positive int): {}
 Visuals (True/False): {}
 """
 
-def menu(menu_list: typing.List[str]) -> int:
+def menu(menu_list: typing.List[str]) -> str:
     """Menu function
     Prints a list of options which the user can choose as input given a list.
     Precondition: menu_list is a list of strings.
