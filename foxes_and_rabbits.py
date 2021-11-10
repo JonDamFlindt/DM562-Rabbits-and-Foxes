@@ -25,27 +25,21 @@ def menu(menu_list: List[str]) -> str:
 
   state = None # Initialize variable
   viable_states = range(len(menu_list)) # Get viable states from the menu
-     
+
   while state not in viable_states:
-    print("Action selection:")
+    print("\nAction selection:")
     for option in viable_states: # Prints all menu options
       print(str(option + 1) + '.', menu_list[option].capitalize())
-    
-    state = input("Awaiting input: ").lower().replace('.', '').split(' ') # Handles any extra spaces in input
-    state = ' '.join([word for word in state if word != ''])
-    print()
-    
-    try: # Reasoning for try/except here is that even something like "0.2" is not a viable state, and we allow "1." as a valid input.
-      state = int(state) - 1 # Raises ValueError if state is not int
-      if state in viable_states:
-        return menu_list[state]
-    
-    except ValueError: # Checks if state is string in menu
-      if state in menu_list:
-        return state
-        
-  input("Invalid input, please try again (hit enter).") # Only printed if invalid state
-  print()
+
+
+    state = input("Awaiting input: ").lower() #Removes capitalization
+    state = ' '.join([word for word in state.split(' ') if word != '']) # Handles any extra spaces in input
+
+    if state.replace('.','').isdecimal() and float(state) == int(float(state)) and int(float(state)) in viable_states: # Handles float inputs and dots after integers
+      return menu_list[int(float(state)) - 1]
+    elif state in menu_list:
+      return state
+    input("\nInvalid input, please try again (hit enter).") # Only printed if invalid state
 
 state = None # Default state
 while state != start_menu[-1]: # As long as not "quit"
@@ -54,9 +48,8 @@ while state != start_menu[-1]: # As long as not "quit"
   state = menu(start_menu)
 
   if state == start_menu[0]: #Display parameters
-    print("ALL PARAMETERS:")
+    print("\nALL PARAMETERS:")
     print(params)
-    print()
 
   if state == start_menu[1]: #Quick setup
     pass
@@ -75,7 +68,7 @@ while state != start_menu[-1]: # As long as not "quit"
         pass
 
   if state == start_menu[3]: #Run
-    sim_data = sim.Run()
+    sim_data = sim.run(params)
     while state != reporting_menu[-1]: # As long as not "Quit"
       state = menu(reporting_menu)
       
