@@ -24,25 +24,25 @@ def menu(menu_list: List[str]) -> str:
   """
 
   state = None # Initialize variable
-  viable_states = range(len(menu_list)) # Get viable states from the menu
+  viable_states = range(len(menu_list)) #Get viable states from the menu
 
   while state not in viable_states:
     print("\nAction selection:")
-    for option in viable_states: # Prints all menu options
+    for option in viable_states: #Prints all menu options
       print(str(option + 1) + '.', menu_list[option].capitalize())
-
+  
 
     state = input("Awaiting input: ").lower() #Removes capitalization
-    state = ' '.join([word for word in state.split(' ') if word != '']) # Handles any extra spaces in input
+    state = ' '.join([word for word in state.split(' ') if word != '']) #Handles any extra spaces in input
 
-    if state.replace('.','').isdecimal() and float(state) == int(float(state)) and int(float(state)) in viable_states: # Handles floats/dots
+    if state.replace('.','').isdecimal() and float(state) == int(float(state)) and int(float(state)) in viable_states: #Handles floats/dots
       return menu_list[int(float(state)) - 1]
     elif state in menu_list:
       return state
     input("\nInvalid input, please try again (hit enter).") # Only printed if invalid state
 
 state = None # Default state
-while state != start_menu[-1]: # As long as not "quit"
+while state != start_menu[-1]: #As long as not "quit"
   if state not in start_menu:
     print(quick_params.format(params.world, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch))
   state = menu(start_menu)
@@ -55,7 +55,7 @@ while state != start_menu[-1]: # As long as not "quit"
     pass
 
   if state == start_menu[2]: #Advanced setup
-    while state != advanced_menu[-1]: # As long as not "Done/go back"
+    while state != advanced_menu[-1]: #As long as not "done"
 
       state = menu(advanced_menu)
       if state == advanced_menu[0]: #World
@@ -69,18 +69,16 @@ while state != start_menu[-1]: # As long as not "quit"
 
   if state == start_menu[3]: #Run
     sim_data = sim.run(params)
-    while state != reporting_menu[-1]: # As long as not "Quit"
+    while state != reporting_menu[-1]: #As long as not "quit"
       state = menu(reporting_menu)
       
       if state == reporting_menu[0]: #Print summary
-        pass
+        report.print_summary
       if state == reporting_menu[1]: #Plot pop. size / time
-        pass
+        report.plot_pop_size
       if state == reporting_menu[2]: #Plot lifespan
-        pass
+        report.plot_lifespan
       if state == reporting_menu[3]: #Plot energy
-        pass
+        report.plot_energy
       if state == reporting_menu[4]: #Plot kills distribution
-        pass
-      if state == reporting_menu[5]: #Plot all
-        pass
+        report.plot_kills
