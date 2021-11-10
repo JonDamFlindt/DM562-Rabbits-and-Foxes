@@ -1,4 +1,4 @@
-import parameters as param
+import parameters
 import simulation as sim
 import reporting as report
 from typing import List
@@ -8,29 +8,22 @@ start_menu = ['display parameters', 'quick setup', 'advanced setup', 'run', 'qui
 advanced_menu = ['world', 'rabbits', 'foxes', 'execution', 'done']
 reporting_menu = ['print summary', 'plot pop. size / time', 'plot lifespan', 'plot energy', 'plot kills distrubution', 'quit']
 
-quick_params = """QUICK PARAMETERS:
-North/South length (height, positive int): {}
-West/East length (width, positive int): {}
-[Fox] Initial size (positive int): {}
-[Rabbit] Initial size (positive int): {}
-Visuals (True/False): {}
-"""
+params = parameters.Simulation()
 
-"""ADVANCED PARAMETERS:
-{}
-{}
-{}
-{}
-{}
-{}
+quick_params = """QUICK PARAMETERS:
+world: {} (north/south by west/east lengths)
+initial rabbits: {}
+initial foxes: {}
+batch mode: {}
 """
 
 def menu(menu_list: List[str]) -> str:
-  """Menu function
+  """Menu function:
   Prints a list of options which the user can choose as input given a list.
+  User input is either a number (e.g. "1." or "1") or a string (e.g. "Done")
   """
+
   state = None # Initialize variable
-  
   viable_states = range(len(menu_list)) # Get viable states from the menu
      
   while state not in viable_states:
@@ -41,9 +34,8 @@ def menu(menu_list: List[str]) -> str:
     state = input("Awaiting input: ").lower().replace('.', '').split(' ') # Handles any extra spaces in input
     state = ' '.join([word for word in state if word != ''])
     print()
-
     
-    try: # Reasoning for try/except here is that even something like 0.2 is not a viable state, and we allow "1." as a valid input.
+    try: # Reasoning for try/except here is that even something like "0.2" is not a viable state, and we allow "1." as a valid input.
       state = int(state) - 1 # Raises ValueError if state is not int
       if state in viable_states:
         return menu_list[state]
@@ -52,21 +44,22 @@ def menu(menu_list: List[str]) -> str:
       if state in menu_list:
         return state
         
-  input("Invalid input, please try again (hit enter).\n") # Only printed if invalid state
+  input("Invalid input, please try again (hit enter).") # Only printed if invalid state
+  print()
 
 state = None # Default state
-
 while state != start_menu[-1]: # As long as not "quit"
   if state not in start_menu:
-    print(quick_params)
+    print(quick_params.format(params.world, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch))
   state = menu(start_menu)
 
   if state == start_menu[0]: #Display parameters
+    print("ALL PARAMETERS:")
+    print(params)
     print()
 
-
   if state == start_menu[1]: #Quick setup
-    pass      
+    pass
 
   if state == start_menu[2]: #Advanced setup
     while state != advanced_menu[-1]: # As long as not "Done/go back"
@@ -97,4 +90,4 @@ while state != start_menu[-1]: # As long as not "quit"
       if state == reporting_menu[4]: #Plot kills distribution
         pass
       if state == reporting_menu[5]: #Plot all
-        pass            
+        pass
