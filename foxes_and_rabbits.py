@@ -35,7 +35,7 @@ def menu(menu_list: List[str]) -> str:
     state = input("Awaiting input: ").lower() #Removes capitalization
     state = ' '.join([word for word in state.split(' ') if word != '']) #Handles any extra spaces in input
 
-    if state.replace('.','').isdecimal() and float(state) == int(float(state)) and int(float(state)) in viable_states: #Handles floats/dots
+    if state.replace('.','').isdecimal() and float(state) == int(float(state)) and int(float(state)) - 1 in viable_states: #Handles floats/dots
       return menu_list[int(float(state)) - 1]
     elif state in menu_list:
       return state
