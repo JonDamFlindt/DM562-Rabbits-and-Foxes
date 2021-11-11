@@ -85,7 +85,12 @@ def input_parameters(current_params: list, msg_list: List[str], option_type: Lis
       
       elif type_bool or type_int or type_float:
         parameter_list[i] = eval(parameter_list[i].capitalize())
-      
+        
+        if msg_list[i].endswith('length') and parameter_list[i] == 0:
+          parameter_list[i] = None
+          print("Lengths cannot be 0.")
+          
+          
       elif parameter_list[i] is not option_type[i]: # This is not run if input is supposed to be a string, otherwise it is
         print(f"Input '{parameter_list[i]}' is not of expected type '{option_type[i].__name__}'")
 
