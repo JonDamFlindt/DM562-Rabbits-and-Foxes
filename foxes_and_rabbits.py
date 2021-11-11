@@ -59,7 +59,7 @@ def menu(menu_list: List[str]) -> str:
     input("Invalid input, please try again (hit enter).") # Only printed if invalid state
 
 
-def input_parameters(msg_list: List[str], option_type: List[type]) -> list:
+def input_parameters(current_params: list, msg_list: List[str], option_type: List[type]) -> list:
   """Returns a list of valid parameters, given a list of input messages, errors and parameter types."""
 
   assert len(msg_list) ==  len(option_type), "List input length mismatch"
@@ -92,6 +92,9 @@ def input_parameters(msg_list: List[str], option_type: List[type]) -> list:
       else:
         print("Invalid input, try again.")
 
+  for i in range(len(parameter_list)):
+    parameter_list[i] = current_params[i] if parameter_list[i] == '~' else parameter_list[i]
+
   print()
   return parameter_list
 
@@ -113,7 +116,8 @@ while state != start_menu[-1]: #As long as not "quit"
 
   if state == start_menu[1]: #Quick 
     # Assigns new values to the simulation
-    params.world.north_south_length, params.world.west_east_length, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch = input_parameters(quick_vars, quick_types) 
+    current_params = [params.world.north_south_length, params.world.west_east_length, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch]
+    params.world.north_south_length, params.world.west_east_length, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch = input_parameters(current_params, quick_vars, quick_types) 
     
     state = None # This is only used to re-display the quick start parameters
     
