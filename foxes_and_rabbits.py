@@ -91,10 +91,10 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
       elif type_bool or type_int or type_float:
         user_parameters[i] = eval(user_parameters[i].capitalize()) # Capitalize in case of bool
         if type_float:
-          user_parameters[i] = float(user_parameters[i])
+          user_parameters[i] = float(user_parameters[i]) # In case float input is "1" or "0" as ints
         
       else:
-        print(f"Invalid input, input was not of type '{current_type.__name__}'.")
+        print(f"Invalid input, not of type '{current_type.__name__}'.")
 
   for i in range(len(user_parameters)):
     user_parameters[i] = current_params[i] if user_parameters[i] == '~' else user_parameters[i]
@@ -200,14 +200,6 @@ while state != start_menu[-1]: #As long as not "quit"
           report.plot_kills(sim_data)
 
     except AssertionError:
-      # Metabolism isn't taken into account since we already do not allow negative numbers
-      
-      if not (params.world.north_south_length > 0 and params.world.west_east_length > 0):
-        err = 'World lengths cannot be non-positive, please re-check parameters.' 
-
-      elif not (params.world.area() >= params.rabbits.initial_size and params.world.area() >= params.foxes.initial_size):
-        err = 'Initial population sizes must be smaller than world area, please re-check parameters.'
-
-      else:
-        err = 'Reproduction probabilities must be between 0 and 1.'
+      print('Invalid parameters detected, please redo setup.')
+      state = None
       
