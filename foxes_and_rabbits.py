@@ -28,7 +28,7 @@ params = parameters.Simulation()
 
 
 def _user_input(msg: str = 'Awaiting input'):
-  """Awaits an input and removes any excess spaces"""
+  """Awaits an input and removes any excess spaces."""
   user = input(msg + ': ').lower() #User input, removes capitalization
   user = ' '.join([word for word in user.split(' ') if word != '']) # Handles any extra spaces in input
   return user
@@ -43,23 +43,27 @@ def menu(menu_list: List[str]) -> str:
   User input is either a number (e.g. "1." or "1") or a string (e.g. "Done")
   """
 
-  state = None # Initialize variable
+  state = None # Initialize state
   viable_states = range(len(menu_list)) #Get viable states from the menu
 
-  while True:
+  while state not in menu_list:
     print("\nAction selection:")
     for option in viable_states: #Prints all menu options
       print(str(option + 1) + '.', menu_list[option].capitalize())
 
-    state = _user_input()
+    user = _user_input()
     print()
 
-    if is_integer(state) and float(state) - 1 in viable_states: #Handles floats/dots
-        return menu_list[int(float(state)) - 1]
+    if is_integer(user) and float(user) - 1 in viable_states: #Handles floats/dots
+        state = menu_list[int(float(user)) - 1]
   
-    elif state in menu_list:
-      return state
-    input("Invalid input, please try again (hit enter).") # Only printed if invalid state
+    elif user in menu_list:
+      state = user
+
+    else:
+      input("Invalid input, please try again (hit enter).") # Only printed if invalid state
+
+  return state
 
 
 def input_parameters(current_params: list, msg_list: List[str]) -> list:
