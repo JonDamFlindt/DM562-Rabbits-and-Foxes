@@ -9,11 +9,10 @@ advanced_menu = ['world', 'rabbits', 'foxes', 'execution', 'done']
 reporting_menu = ['print summary', 'plot pop. size / time', 'plot lifespan', 'plot energy', 'plot kills distrubution', 'quit']
 
 # Setting up variable changers
-quick_vars = ['north/south length', 'west/east length', 'initial rabbits', 'initial foxes', 'max steps', 'batch (no visuals)']
-
-adv_world = ['toroidal', 'north/south length', 'west/east length']
-adv_pop = ['initial size', 'max age', 'max energy', 'metabolism', 'reproduction probability', 'min reproduction age', 'min reproduction energy']
-adv_exe = ['max steps', 'batch mode']
+quick_vars = ['north/south length (positive int)', 'west/east length (positive int)', 'initial rabbits (int)', 'initial foxes (int)', 'max steps (int)', 'batch mode (bool)']
+adv_world = ['toroidal (bool)', 'north/south length (positive int)', 'west/east length (positive int)']
+adv_pop = ['initial size (int)', 'max age (int)', 'max energy (int)', 'metabolism (int)', 'reproduction probability (float between 1 and 0)', 'min reproduction age (int)', 'min reproduction energy (int)']
+adv_exe = ['max steps (int)', 'batch mode (bool)']
 
 
 quick_param_msg = """QUICK PARAMETERS:
@@ -28,9 +27,9 @@ params = parameters.Simulation()
 
 
 
-def _user_input(*msg: str):
+def _user_input(msg: str = 'Awaiting input'):
   """Awaits an input and removes any excess spaces"""
-  user = input(' '.join(msg) + ': ').lower() #User input, removes capitalization
+  user = input(msg + ': ').lower() #User input, removes capitalization
   user = ' '.join([word for word in user.split(' ') if word != '']) # Handles any extra spaces in input
   return user
 
@@ -52,7 +51,7 @@ def menu(menu_list: List[str]) -> str:
     for option in viable_states: #Prints all menu options
       print(str(option + 1) + '.', menu_list[option].capitalize())
 
-    state = _user_input("Awaiting input")
+    state = _user_input()
     print()
 
     if is_integer(state) and float(state) - 1 in viable_states: #Handles floats/dots
@@ -68,12 +67,13 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
 
   assert len(current_params) == len(msg_list), "List input length mismatch"
   user_parameters = [None] * len(current_params)
+  print("Parameter setup, skip parameter change by pressing enter or w/ '~' or '-')")
 
 
   for i in range(len(msg_list)): # Go through every parameter
     current_type = type(current_params[i])
     while type(user_parameters[i]) is not current_type and (user_parameters[i] != '~'): # Wait until either "skip" or correct input type
-      user_parameters[i] = _user_input(msg_list[i], f"(skip by hitting enter or w/ '~' or '-')") # Print setting
+      user_parameters[i] = _user_input(msg_list[i]) # Print setting
 
       # Below are checks to see if inputs are valid types
       type_bool = current_type is bool and user_parameters[i] in ['true', 'false']
