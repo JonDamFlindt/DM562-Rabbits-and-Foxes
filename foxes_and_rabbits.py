@@ -10,14 +10,10 @@ reporting_menu = ['print summary', 'plot pop. size / time', 'plot lifespan', 'pl
 
 # Setting up variable changers
 quick_vars = ['north/south length', 'west/east length', 'initial rabbits', 'initial foxes', 'max steps', 'batch (no visuals)']
-quick_types = [int] * 5 + [bool]
 
-adv_world = ['shape', 'north/south length', 'west/east length']
+adv_world = ['toroidal', 'north/south length', 'west/east length']
 adv_pop = ['initial size', 'max age', 'max energy', 'metabolism', 'reproduction probability', 'min reproduction age', 'min reproduction energy']
-adv_exe = ['max steps', 'batch (no visuals)']
-adv_world_types = [str, int, int]
-adv_pop_types = [int] * 4 + [float, int, int]
-adv_exe_types = [int, bool]
+adv_exe = ['max steps', 'batch mode']
 
 
 quick_param_msg = """QUICK PARAMETERS:
@@ -67,46 +63,46 @@ def menu(menu_list: List[str]) -> str:
     input("Invalid input, please try again (hit enter).") # Only printed if invalid state
 
 
-def input_parameters(current_params: list, msg_list: List[str], option_type: List[type]) -> list:
-  """Returns a list of valid parameters, given a list of input messages, errors and parameter types."""
+def input_parameters(parameter: parameters.Simulation, msg_list: List[str]):
+  user_parameters = [None]
 
-  assert len(current_params) == len(msg_list) ==  len(option_type), "List input length mismatch"
+def input_parameters(current_params: list, msg_list: List[str]) -> list:
+  """Returns a list of valid parameters, given a list of current parameters and input messages."""
+
+  assert len(current_params) == len(msg_list), "List input length mismatch"
   user_parameters = [None] * len(current_params)
 
 
   for i in range(len(msg_list)): # Go through every parameter
-    while (type(user_parameters[i]) is not option_type[i]) and (user_parameters[i] != '~'): # Wait until either "skip" or correct input type
-      user_parameters[i] = _user_input(msg_list[i], f"(skip w/ '~' or '--')") # Print setting
+    current_type = type(current_params[i])
+    while type(user_parameters[i]) is not current_type and (user_parameters[i] != '~'): # Wait until either "skip" or correct input type
+      user_parameters[i] = _user_input(msg_list[i], f"(skip by hitting enter or w/ '~' or '-')") # Print setting
 
       # Below are checks to see if inputs are valid types
-      type_bool = option_type[i] is bool and user_parameters[i] in ['true', 'false']
-      type_int = option_type[i] is int and is_integer(user_parameters[i])
-      type_float = option_type[i] is float and user_parameters[i].replace('.', '', 1).isdecimal()
+      type_bool = current_type is bool and user_parameters[i] in ['true', 'false']
+      type_int = current_type is int and is_integer(user_parameters[i])
+      type_float = current_type is float and user_parameters[i].replace('.', '', 1).isdecimal()
 
-      if (user_parameters[i] in skip_entry for skip_entry in ['', '~~~', '---']):
+      if user_parameters[i] in ['', '~', '-']:
         user_parameters[i] = '~'
         print("Skipping...")
 
       elif '-' in user_parameters[i]: # Stops negative inputs
         print("Hyphens and minus signs (i.e. negative numbers) are not allowed, try again.")
 
-      elif user_parameters[i] in ['island', 'toroid'] and type(user_parameters[i]) is str:
-        pass # If this is supposed to be 'island' or 'toroid', do nothing to input. This could have been continue, if necessary.
-
       # If types are valid, evaluate (this converts the string to its correct type, and only if it is of that type)
       elif type_bool or type_int or type_float:
         user_parameters[i] = eval(user_parameters[i].capitalize()) # Capitalize in case of bool
+        if type_float:
+          user_parameters[i] = float(user_parameters[i])
         
       else:
-        print(f"Invalid input, input was not of type '{param_type.__name__}'.")
+        print(f"Invalid input, input was not of type '{current_type.__name__}'.")
 
   for i in range(len(user_parameters)):
     user_parameters[i] = current_params[i] if user_parameters[i] == '~' else user_parameters[i]
 
-  print()
   return user_parameters
-
-
 
 
 
@@ -134,13 +130,16 @@ while state != start_menu[-1]: #As long as not "quit"
                       params.world.west_east_length,
                       params.rabbits.initial_size,
                       params.foxes.initial_size,
+                      params.execution.max_steps,
                       params.execution.batch]
 
-    new_params = input_parameters(current_params, quick_vars, quick_types)
+    new_params = input_parameters(current_params, quick_vars)
     
-    params.world.north_south_length, params.world.west_east_length, params.rabbits.initial_size, params.foxes.initial_size, params.execution.batch = new_params
+    params.world.north_south_length, params.world.west_east_length = new_params[0:2]
+    params.rabbits.initial_size, params.foxes.initial_size = new_params[2:4]
+    params.execution.max_steps, params.execution.batch = new_params[4:6]
 
-    print()    
+    print()
     state = None # This is only used to re-display the quick start parameters
     
   if state == start_menu[2]: #Advanced setup
@@ -148,11 +147,11 @@ while state != start_menu[-1]: #As long as not "quit"
 
       state = menu(advanced_menu)
       if state == advanced_menu[0]: #World
-        current_params = [params.world.shape,
+        current_params = [params.world.is_toroid,
                           params.world.north_south_length,
                           params.world.west_east_length]
-        new_params = input_parameters(current_params, adv_world, adv_world_types)
-        params.world.shape, params.world.north_south_length, params.world.west_east_length = new_params
+        new_params = input_parameters(current_params, adv_world)
+        params.world.is_toroid, params.world.north_south_length, params.world.west_east_length = new_params
         
       if state == advanced_menu[1]: #Rabbit population
         current_params = [params.rabbits.initial_size,
@@ -162,10 +161,10 @@ while state != start_menu[-1]: #As long as not "quit"
                           params.rabbits.reproduction_probability,
                           params.rabbits.reproduction_min_age,
                           params.rabbits.reproduction_min_energy]
-        new_params = input_parameters(current_params, adv_pop, adv_pop_types)
+        new_params = input_parameters(current_params, adv_pop)
         
-        params.rabbits.initial_size, params.rabbits.max_age, params.rabbits.max_energy, params.rabbits.metabolism = new_params[0:3]
-        params.rabbits.reproduction_probability, params.rabbits.reproduction_min_age, params.rabbits.reproduction_min_energy = new_params[4:6]
+        params.rabbits.initial_size, params.rabbits.max_age, params.rabbits.max_energy, params.rabbits.metabolism = new_params[:4]
+        params.rabbits.reproduction_probability, params.rabbits.reproduction_min_age, params.rabbits.reproduction_min_energy = new_params[4:]
       
       if state == advanced_menu[2]: #Fox population
         current_params = [params.foxes.initial_size,
@@ -175,14 +174,14 @@ while state != start_menu[-1]: #As long as not "quit"
                           params.foxes.reproduction_probability,
                           params.foxes.reproduction_min_age,
                           params.foxes.reproduction_min_energy]
-        new_params = input_parameters(current_params, adv_pop, adv_pop_types)
+        new_params = input_parameters(current_params, adv_pop)
         
-        params.foxes.initial_size, params.foxes.max_age, params.foxes.max_energy, params.foxes.metabolism = new_params[0:3]
-        params.foxes.reproduction_probability, params.foxes.reproduction_min_age, params.foxes.reproduction_min_energy = new_params[4:6]
+        params.foxes.initial_size, params.foxes.max_age, params.foxes.max_energy, params.foxes.metabolism = new_params[:4]
+        params.foxes.reproduction_probability, params.foxes.reproduction_min_age, params.foxes.reproduction_min_energy = new_params[4:]
       
       if state == advanced_menu[3]: #Execution
         current_params = [params.execution.max_steps, params.execution.batch]
-        params.execution.max_steps, params.execution.batch = input_parameters(current_params, adv_exe, adv_exe_types)
+        params.execution.max_steps, params.execution.batch = input_parameters(current_params, adv_exe)
         
     state = None # This is only used to re-display the quick start parameters
 
