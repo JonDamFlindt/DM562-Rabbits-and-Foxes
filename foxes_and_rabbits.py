@@ -63,9 +63,6 @@ def menu(menu_list: List[str]) -> str:
     input("Invalid input, please try again (hit enter).") # Only printed if invalid state
 
 
-def input_parameters(parameter: parameters.Simulation, msg_list: List[str]):
-  user_parameters = [None]
-
 def input_parameters(current_params: list, msg_list: List[str]) -> list:
   """Returns a list of valid parameters, given a list of current parameters and input messages."""
 
@@ -135,9 +132,9 @@ while state != start_menu[-1]: #As long as not "quit"
 
     new_params = input_parameters(current_params, quick_vars)
     
-    params.world.north_south_length, params.world.west_east_length = new_params[0:2]
+    params.world.north_south_length, params.world.west_east_length = new_params[:2]
     params.rabbits.initial_size, params.foxes.initial_size = new_params[2:4]
-    params.execution.max_steps, params.execution.batch = new_params[4:6]
+    params.execution.max_steps, params.execution.batch = new_params[4:]
 
     print()
     state = None # This is only used to re-display the quick start parameters
