@@ -1,7 +1,7 @@
 import parameters
 import simulation as sim
 import reporting as report
-from typing import List, Union
+from typing import List
 
 # Setting up menus
 start_menu = ['display parameters', 'quick setup', 'advanced setup', 'run', 'quit']
