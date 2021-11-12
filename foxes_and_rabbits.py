@@ -11,7 +11,7 @@ reporting_menu = ['print summary', 'plot pop. size / time', 'plot lifespan', 'pl
 # Setting up variable changers
 quick_vars = ['north/south length (positive int)', 'west/east length (positive int)', 'initial rabbits (int)', 'initial foxes (int)', 'max steps (int)', 'batch mode (bool)']
 adv_world = ['toroidal (bool)', 'north/south length (positive int)', 'west/east length (positive int)']
-adv_pop = ['initial size (int)', 'max age (int)', 'max energy (int)', 'metabolism (int)', 'reproduction probability (float between 1 and 0)', 'min reproduction age (int)', 'min reproduction energy (int)']
+adv_pop = ['initial size (int)', 'max age (int)', 'max energy (int)', 'metabolism (int)', 'reproduction probability (float between 0 and 1)', 'min reproduction age (int)', 'min reproduction energy (int)']
 adv_exe = ['max steps (int)', 'batch mode (bool)']
 
 
