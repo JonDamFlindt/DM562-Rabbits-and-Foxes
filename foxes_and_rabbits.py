@@ -73,10 +73,9 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
   user_parameters = [None] * len(current_params)
   print("Parameter setup, skip parameter change by pressing enter or w/ '~' or '-')")
 
-
   for i in range(len(msg_list)): # Go through every parameter
     current_type = type(current_params[i])
-    while type(user_parameters[i]) is not current_type and (user_parameters[i] != '~'): # Wait until either "skip" or correct input type
+    while type(user_parameters[i]) is not current_type: # Wait until either "skip" or correct input type
       user_parameters[i] = _user_input(msg_list[i] + f' (currently {current_params[i]})') # Print setting
 
       # Below are checks to see if inputs are valid types
@@ -85,7 +84,7 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
       type_float = current_type is float and user_parameters[i].replace('.', '', 1).isdecimal()
 
       if user_parameters[i] in ['', '~', '-']:
-        user_parameters[i] = '~'
+        user_parameters[i] = current_params[i]
         print("Skipping...")
 
       elif '-' in user_parameters[i]: # Stops negative inputs
@@ -98,10 +97,7 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
           user_parameters[i] = float(user_parameters[i]) # In case float input is "1" or "0" as ints
         
       else:
-        print(f"Invalid input, not of type '{current_type.__name__}'.")
-
-  for i in range(len(user_parameters)):
-    user_parameters[i] = current_params[i] if user_parameters[i] == '~' else user_parameters[i]
+        print(f"Invalid input, not of type '{current_type.__name__}'.")   
 
   return user_parameters
 
