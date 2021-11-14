@@ -51,7 +51,7 @@ def menu(menu_list: List[str]) -> str:
     for option in viable_states: #Prints all menu options
       print(str(option + 1) + '.', menu_list[option].capitalize())
 
-    user = _user_input()
+    user = _user_input() #Basically just input() that handles spaces
     print()
 
     if is_integer(user) and float(user) - 1 in viable_states: #Handles floats/dots
@@ -77,7 +77,7 @@ def input_parameters(current_params: list, msg_list: List[str]) -> list:
   for i in range(len(msg_list)): # Go through every parameter
     current_type = type(current_params[i])
     while type(user_parameters[i]) is not current_type and (user_parameters[i] != '~'): # Wait until either "skip" or correct input type
-      user_parameters[i] = _user_input(msg_list[i]) # Print setting
+      user_parameters[i] = _user_input(msg_list[i] + f' (currently {current_params[i]})') # Print setting
 
       # Below are checks to see if inputs are valid types
       type_bool = current_type is bool and user_parameters[i] in ['true', 'false']
