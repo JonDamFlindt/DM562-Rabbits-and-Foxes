@@ -200,6 +200,6 @@ while state != start_menu[-1]: #As long as not "quit"
           report.plot_kills(sim_data)
 
     except AssertionError:
-      print('Invalid parameters detected, please redo setup.')
+      input('Invalid parameters detected, please redo setup (press enter).')
       state = None
       
