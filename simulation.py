@@ -23,7 +23,7 @@ def run(parameters):
         patches.append(entities.Patch(i % parameters.world.west_east_length, i // parameters.world.west_east_length))
 
     def data_on_birth(animal):
-        """Records every living member of each species upon birth."""
+        """Records every number of living members of each species upon birth."""
         if type(animal) is entities.Fox:
             stats.foxes.total += 1
         else:
