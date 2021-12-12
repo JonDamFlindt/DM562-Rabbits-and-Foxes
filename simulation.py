@@ -84,9 +84,8 @@ def run(parameters):
                     
         else: # If not toroid
             for i in range(len(all_moves)):
-                legal_moves.append(all_moves[i])
-                if all_moves[i][0] < 0 or all_moves[i][1] < 0 or all_moves[i][0] >= parameters.world.west_east_length or all_moves[i][1] >= parameters.world.north_south_length:
-                    legal_moves.remove(all_moves[i]) # Remove all illegal moves, i.e. points whose coordinates are out of range.
+                if all_moves[i][0] >= 0 and all_moves[i][1] >= 0 and all_moves[i][0] < parameters.world.west_east_length and all_moves[i][1] < parameters.world.north_south_length:
+                    legal_moves.append(all_moves[i]) # Remove all illegal moves, i.e. points whose coordinates are out of range.
             all_moves = [move for move in all_moves if move in legal_moves]
             
 
