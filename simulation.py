@@ -167,16 +167,13 @@ def run(parameters):
                                 stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_rabbits += 1
 
-                            stats.avg_energy_per_step[sim_step] += animal.energy()
 
-                            
-        
+
+        stats.avg_energy_per_step[sim_step] = (stats.foxes.avg_energy_per_step[sim_step] + stats.rabbits.avg_energy_per_step[sim_step]) / (alive_foxes + alive_rabbits)
         if alive_foxes > 0:
             stats.foxes.avg_energy_per_step[sim_step] /= alive_foxes
         if alive_rabbits > 0:
             stats.rabbits.avg_energy_per_step[sim_step] /= alive_rabbits
-
-        stats.avg_energy_per_step[sim_step] /= (alive_foxes + alive_rabbits)
         
         world.update(sim_step)
         sim_step += 1
