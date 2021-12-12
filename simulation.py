@@ -52,7 +52,7 @@ def run(parameters):
         popStats.age_at_death.append(animal.age())
 
         ### CAUSE OF DEATH
-        if animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
+        if animal.energy() <= 0: # Not enough food; mainly an issue for foxes.
                 popStats.dead_by_starvation += 1
         elif type(animal) == entities.Rabbit and animal.was_killed(): # Only occurs for rabbits
             popStats.dead_by_predation += 1
