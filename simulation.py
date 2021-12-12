@@ -52,7 +52,7 @@ def run(parameters):
         popStats.age_at_death.append(animal.age())
 
         ### CAUSE OF DEATH
-        if animal.energy() <= 0: # Not enough food; mainly an issue for foxes.
+        if animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
                 popStats.dead_by_starvation += 1
         elif type(animal) == entities.Rabbit and animal.was_killed(): # Only occurs for rabbits
             popStats.dead_by_predation += 1
@@ -74,31 +74,31 @@ def run(parameters):
         all_moves.append([coords[0], coords[1] + 1]) # Down
         all_moves.append([coords[0] - 1, coords[1]]) # Left
         all_moves.append([coords[0] + 1, coords[1]]) # Right
-
+            
 
         if parameters.world.is_toroid: # If toroid, make coordinates "loop".
             for i in range(len(all_moves)): #Re-index all points to the visible plane/within range
                 all_moves[i][0]  %= parameters.world.west_east_length
                 all_moves[i][1] %= parameters.world.north_south_length
+                legal_moves.append(all_moves[i])
                     
         else: # If not toroid
             for i in range(len(all_moves)):
-                if all_moves[i][0] < 0 or all_moves[i][1] < 0 or all_moves[i][0] >= parameters.world.west_east_length or all_moves[i][0] >= parameters.world.north_south_length:
-                    all_moves.pop(i) # Remove all illegal moves, i.e. points whose coordinates are out of range.
-
+                legal_moves.append(all_moves[i])
+                if all_moves[i][0] < 0 or all_moves[i][1] < 0 or all_moves[i][0] >= parameters.world.west_east_length or all_moves[i][1] >= parameters.world.north_south_length:
+                    legal_moves.remove(all_moves[i]) # Remove all illegal moves, i.e. points whose coordinates are out of range.
+            all_moves = [move for move in all_moves if move in legal_moves]
+            
 
         index_from_coords = lambda x,y: x + parameters.world.west_east_length * y #Gets index from x and y value
-
-        for i in all_moves:
-            legal_moves.append(i)
-            
-        for coordinate_index in range(len(all_moves)):
-            potential_patch = patches[index_from_coords(*all_moves[coordinate_index])]
+        
+        for i in range(len(all_moves)):
+            potential_patch = patches[index_from_coords(*all_moves[i])]
             
             if moving_animal.same_species_in(potential_patch):
-                legal_moves.remove(all_moves[coordinate_index]) # Remove all patches with same species in it
+                legal_moves.remove(all_moves[i]) # Remove all patches with same species in it
             elif moving_animal.predators_in(potential_patch) and is_reproducing:
-                legal_moves.remove(all_moves[coordinate_index]) # Remove all predator patches if reproducing
+                legal_moves.remove(all_moves[i]) # Remove all predator patches if reproducing
 
         if legal_moves == []:
             move = None
@@ -167,8 +167,7 @@ def run(parameters):
                                 stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_rabbits += 1
 
-
-
+            
         stats.avg_energy_per_step[sim_step] = (stats.foxes.avg_energy_per_step[sim_step] + stats.rabbits.avg_energy_per_step[sim_step]) / (alive_foxes + alive_rabbits)
         if alive_foxes > 0:
             stats.foxes.avg_energy_per_step[sim_step] /= alive_foxes
