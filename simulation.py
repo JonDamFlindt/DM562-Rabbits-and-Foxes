@@ -1,12 +1,11 @@
 import random
 import entities
 import visualiser as vis
-import parameters
+import parameters as pars
 import results
 from typing import Union, List, Tuple
 
 
-    
 
 def run(parameters):
     patches = []
@@ -30,7 +29,7 @@ def run(parameters):
             stats.rabbits.total += 1
         
 
-    def init_animals(animal_entity: type(entities.Animal), pop_parameters: type(parameters.rabbits)):
+    def init_animals(animal_entity: type(entities.Animal), pop_parameters: pars.Population):
         """"Adds the initial population to random patches of grass in the world."""
         counter = 0
         while counter < pop_parameters.initial_size:
@@ -50,7 +49,7 @@ def run(parameters):
         else:
             popStats = stats.rabbits
 
-        popStats.age_at_death.append(animal.age)
+        popStats.age_at_death.append(animal.age())
 
         ### CAUSE OF DEATH
         if animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
@@ -109,13 +108,26 @@ def run(parameters):
         return move
 
 
-    init_animals(entities.Rabbit, parameters.rabbits)
-    init_animals(entities.Fox, parameters.foxes)
+    init_animals(entities.Rabbit, parameters.rabbits) # Add rabbit population
+    init_animals(entities.Fox, parameters.foxes) # Add fox population
 
-    world = vis.ColourGraphics(parameters.execution.max_steps, patches, parameters.world.west_east_length, parameters.world.north_south_length)
+
+    #Visuals/no visuals
+    if parameters.execution.batch:
+        world = vis.Batch(parameters.execution.max_steps)
+    else:
+        world = vis.ColourGraphics(parameters.execution.max_steps, patches, parameters.world.west_east_length, parameters.world.north_south_length)
     world.start()
-
+    
+    ### SIMULATION
     while sim_step < parameters.execution.max_steps and not all_dead:
+        stats.avg_energy_per_step.append(0)
+        stats.rabbits.avg_energy_per_step.append(0)
+        stats.foxes.avg_energy_per_step.append(0)
+        stats.rabbits.size_per_step.append(0)
+        stats.foxes.size_per_step.append(0)
+        alive_foxes = 0
+        alive_rabbits = 0
         all_dead = True
         
         for patch in patches:
@@ -131,7 +143,7 @@ def run(parameters):
                         else:
                             animal.feed() #Otherwise eat
 
-                        if not animal.is_alive(): #If dead
+                        if not animal.is_alive(): #If dead, update death data
                             data_on_death(animal)
     
                         
@@ -146,8 +158,28 @@ def run(parameters):
                             if new_patch is not None:
                                 animal.move_to(new_patch)
 
-        sim_step += 1
-        world.update(i)
+                            if type(animal) ==  entities.Fox:
+                                stats.foxes.size_per_step[sim_step] += 1
+                                stats.foxes.avg_energy_per_step[sim_step] += animal.energy()
+                                alive_foxes += 1
+                            else:
+                                stats.rabbits.size_per_step[sim_step] += 1
+                                stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
+                                alive_rabbits += 1
+
+                            stats.avg_energy_per_step[sim_step] += animal.energy()
+
+                            
         
-    world.close()
+        if alive_foxes > 0:
+            stats.foxes.avg_energy_per_step[sim_step] /= alive_foxes
+        if alive_rabbits > 0:
+            stats.rabbits.avg_energy_per_step[sim_step] /= alive_rabbits
+
+        stats.avg_energy_per_step[sim_step] /= (alive_foxes + alive_rabbits)
+        
+        world.update(sim_step)
+        sim_step += 1
+        
+    world.stop()
     return stats
