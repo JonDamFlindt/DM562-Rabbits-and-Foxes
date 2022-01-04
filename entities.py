@@ -16,7 +16,7 @@ class Patch:
    def __init__(self, x: int, y: int):
       self._coords = (x,y)
       self._Animals = []
-      self._grass = random_percentage(max_grass_amount)
+      self._grass = random_percentage(Patch.max_grass_amount)
       
    def coordinates(self) -> Tuple[int, int]:
       return self._coords
@@ -31,26 +31,26 @@ class Patch:
       """
       Progresses time for the patch in the simulation.
       """
-      self._grass += round(random.uniform(min_grass_growth, max_grass_growth))
-      if self._grass > max_grass_amount:
-         self._grass = max_grass_amount
+      self._grass += round(random.uniform(Patch.min_grass_growth, Patch.max_grass_growth))
+      if self._grass > Patch.max_grass_amount:
+         self._grass = Patch.max_grass_amount
 
-   def _check_alive(animal_class_name) -> bool:
-      """ Auxiliary method for checking if an animal is alive. """
+   def _check_alive(self, animal_class_name) -> bool:
+      """ Auxiliary method for checking if an animal type on a given patch is alive. """
       alive = False
       i = 0
       while i < len(self._Animals) and not alive:
-         if patch_pop[i].is_alive() and animal_class_name == type(patch_pop[i]).__name__:
+         if self._Animals[i].is_alive() and animal_class_name == type(self._Animals[i]).__name__:
             alive = True
          else:
             i += 1
       return alive
 
    def has_alive_fox(self) -> bool:
-      return _check_alive(type(self._Foxes).__name__)
+      return self._check_alive(type(Fox).__name__)
 
    def has_alive_rabbit(self) -> bool:
-      return _check_alive(type(self._Rabbits).__name__)
+      return self._check_alive(type(Rabbit).__name__)
 
    def add(self, animal: Animal):
       """
@@ -91,7 +91,7 @@ class Animal:
 
    def patch(self) -> Patch:
       """ Returns the animal's last/current coordinates. """
-      return self._patch.coordinates()
+      return self._patch
 
    def is_alive(self) -> bool:
       """ Returns 'True' if the animal is still alive."""
@@ -100,7 +100,7 @@ class Animal:
    def can_reproduce(self) -> bool:
       rep_req_energy = self.energy() >= self._pop.reproduction_min_energy
       rep_req_age = self.age() >= self._pop.reproduction_min_age
-      return self.is_alive() and rep_energy_req and rep_age_req
+      return self.is_alive() and rep_req_energy and rep_req_age
 
    def tick(self):
       """
@@ -177,7 +177,7 @@ class Fox(Animal):
          
 
    def reproduce(self, newborn_patch: Patch) -> Optional[Fox]:
-      return super().reproduce(newborn_patch, reproduction_cost_rate)  
+      return super().reproduce(newborn_patch, Fox.reproduction_cost_rate)  
 
    def same_species_in(self, patch: Patch) -> bool:
       return patch.has_alive_fox()
@@ -219,7 +219,7 @@ class Rabbit(Animal):
       Feed method for Rabbit, increases its energy by eating grass.
       """
       if self.is_alive():
-         can_eat = int(self._pop.metabolism * feeding_metabolism_rate) # int() to floor the value as grass should be an int
+         can_eat = int(self._pop.metabolism * Rabbit.feeding_metabolism_rate) # int() to floor the value as grass should be an int
          if self._patch._grass - can_eat < 0: # Is there less grass than can be eaten in one step?
             food_amount = self._patch._grass
          else:
@@ -233,7 +233,7 @@ class Rabbit(Animal):
          self._energy += food_amount # int + int = int
 
    def reproduce(self, newborn_patch: Patch) -> Optional[Rabbit]:
-      return super().reproduce(newborn_patch, reproduction_cost_rate)
+      return super().reproduce(newborn_patch, Rabbit.reproduction_cost_rate)
 
    def same_species_in(self, patch: Patch) -> bool:
       return patch.has_alive_rabbit()
