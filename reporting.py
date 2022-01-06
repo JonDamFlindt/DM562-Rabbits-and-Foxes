@@ -26,13 +26,10 @@ predation: {data.dead_by_predation}
    print_info('FOXES', results.foxes)
    print_info('RABBITS', results.rabbits)
 
+   
 
-# Since we have to plot each population and their total,
-# we will use for-loops with preset colors and styles
-# and to re-use code we will use the figure object of pyplot
 plt_style = ['--C1', '--C7', '-k']
 plt_legend = ['Foxes','Rabbits','Total']
-
 
 def _setup_plot(data, plot_title, x_label, y_label):
    plt.title(plot_title)
