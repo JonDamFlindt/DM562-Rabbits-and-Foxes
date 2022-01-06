@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from results import *
 
 
-
-
 def print_summary(results: SimulationStats):
    """Prints a short summary regarding the populations of the simulation."""
    def print_info(animal, data):
@@ -67,6 +65,7 @@ def plot_lifespan(results: SimulationStats):
    fig.suptitle("Lifespans")
    plt.show()
 
+   
 def plot_energy(results: SimulationStats):
    plt_data = [results.foxes.avg_energy_per_step,
                results.rabbits.avg_energy_per_step,
@@ -74,6 +73,7 @@ def plot_energy(results: SimulationStats):
    _setup_plot(plt_data, 'Average energy over time', 'Steps', 'Energy')
    plt.show()
 
+   
 def plot_kills(results: SimulationStats):
    """Plots kills on the grid."""
    all_kills = [kill for patch in results.kills_per_patch for kill in patch]
