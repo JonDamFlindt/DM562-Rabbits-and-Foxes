@@ -106,13 +106,12 @@ class Animal:
       """
       Ages the animal, expends its energy and kills it if it fails meeting survival requirements given by simulation parameters.
       """
-      if self.age() + 1 > self._pop.max_age or self.energy() - self._pop.metabolism < 0:
+      self._age += 1
+      self._energy -= self._pop.metabolism
+      if self.age() >= self._pop.max_age or self.energy() <= 0:
          self._energy = 0
          self._alive = False
-         self._patch.remove(self)
-      else:
-         self._age += 1
-         self._energy -= self._pop.metabolism
+         self._patch.remove(self)         
 
    def move_to(self, patch: Patch):
       if self.is_alive():
