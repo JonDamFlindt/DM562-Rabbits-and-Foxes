@@ -164,7 +164,7 @@ class Fox(Animal):
          food = False
          i = 0
          while not food: # i  cannot go out of index, since we know there is a rabbit.
-            if type(self._patch._Animals[i]).__name__ == "Rabbit":
+            if type(self._patch._Animals[i]).__name__ == "Rabbit" and self._patch._Animals[i].is_alive():
                food = True
             else:
                i += 1
