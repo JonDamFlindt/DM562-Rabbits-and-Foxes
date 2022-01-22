@@ -8,6 +8,9 @@ from typing import Union, List, Tuple
 
 
 def run(parameters):
+    """
+    Run the simulation given parameters and returns data collected.
+    """
     patches = []
     sim_step = 0
     all_dead = False
