@@ -6,7 +6,7 @@ from typing import Type, Tuple, Optional
 
 def random_percentage(variable_max):
    """Returns a random percentage between 0 and a variable's maximum value."""
-   return random.uniform(0,1) * variable_max
+   return round(random.uniform(0,1) * variable_max)
 
 class Patch:
    min_grass_growth = 1
@@ -15,17 +15,19 @@ class Patch:
    
    def __init__(self, x: int, y: int):
       self._coords = (x,y)
-      self._Animals = []
+      self.__Animals = []
       self._grass = random_percentage(Patch.max_grass_amount)
       
    def coordinates(self) -> Tuple[int, int]:
+      """Returns the coordinates of the given patch."""
       return self._coords
 
    def grass(self) -> int:
+      """Returns the amount of grass on the patch."""
       return self._grass
 
    def animals(self) -> list:
-      return self._Animals
+      return self.__Animals
 
    def tick(self):
       """
@@ -35,35 +37,37 @@ class Patch:
       if self._grass > Patch.max_grass_amount:
          self._grass = Patch.max_grass_amount
 
-   def _check_alive(self, animal_class_name) -> bool:
+   def _check_alive(self, animal_class) -> bool:
       """ Auxiliary method for checking if an animal type on a given patch is alive. """
       alive = False
       i = 0
-      while i < len(self._Animals) and not alive:
-         if self._Animals[i].is_alive() and animal_class_name == type(self._Animals[i]).__name__:
+      while i < len(self.__Animals) and not alive:
+         if self.__Animals[i].is_alive() and isinstance(self.__Animals[i], animal_class):
             alive = True
          else:
             i += 1
       return alive
 
    def has_alive_fox(self) -> bool:
-      return self._check_alive(type(Fox).__name__)
+      """Checks whether or not the patch has an alive fox on it."""
+      return self._check_alive(Fox)
 
    def has_alive_rabbit(self) -> bool:
-      return self._check_alive(type(Rabbit).__name__)
+      """Checks whether or not the patch has an alive rabbit on it."""
+      return self._check_alive(Rabbit)
 
    def add(self, animal: Animal):
       """
       Adds the given animal to the patch
       """
-      self._Animals.append(animal)
+      self.__Animals.append(animal)
 
    def remove(self, animal: Animal):
       """
       Removes the given animal from the patch, if it is on the patch.
       """
       try:
-         self._Animals.remove(animal)
+         self.__Animals.remove(animal)
       except ValueError:
          pass
 
@@ -114,6 +118,7 @@ class Animal:
          self._patch.remove(self)         
 
    def move_to(self, patch: Patch):
+      """Moves the animal to the given patch."""
       if self.is_alive():
          self._patch.remove(self)
          self._patch = patch
@@ -121,11 +126,11 @@ class Animal:
 
    def same_species_in(self, patch: Patch) -> bool:
       """Returns 'True' if the given patch has an animal of the same type."""
-      pass
+      raise NotImplementedError()
 
    def predators_in(self, patch: Patch) -> bool:
       """Returns 'True' if the given patch has a predator of the current animal."""
-      pass
+      raise NotImplementedError()
 
    def reproduce(self, newborn_patch: Patch, rep_cost_rate) -> Optional[Animal]:
       """
@@ -133,7 +138,7 @@ class Animal:
       Should be called from a descendant of Animal, i.e. not an Animal object, hence the __name__ check.
       """
       if self.can_reproduce() and random.uniform(0,1) < self._pop.reproduction_probability and type(self).__name__ != "Animal":
-         newborn = self.__class__(self._pop, newborn_patch, 0)
+         newborn = self.__class__(self._pop, newborn_patch, 0) # The "clever!" line.
          self._energy -= self._pop.reproduction_min_energy * rep_cost_rate
          newborn_patch.add(newborn)
          return newborn
@@ -157,28 +162,28 @@ class Fox(Animal):
       return super().is_alive()
 
    def feed(self):
-      """
-      Feed method for Fox, increases its energy by eating rabbits.
-      """
+      """Feed method for Fox, increases its energy by eating rabbits."""
       if self.is_alive() and self._patch.has_alive_rabbit() and self.energy() < self._pop.max_energy:
          food = False
          i = 0
          while not food: # i  cannot go out of index, since we know there is a rabbit.
-            if type(self._patch._Animals[i]).__name__ == "Rabbit" and self._patch._Animals[i].is_alive():
+            if type(self._patch.__Animals[i]).__name__ == "Rabbit" and self._patch.__Animals[i].is_alive():
                food = True
             else:
                i += 1
-         
-         self._patch._Animals[i].kill() # Kill the rabbit
-         self._energy += food_energy_per_unit
+
+         self._patch.__Animals[i].kill() # Kill the rabbit
+         self._energy += self.food_energy_per_unit
          if self._energy > self._pop.max_energy:
             self._energy = self._pop.max_energy
          
 
    def reproduce(self, newborn_patch: Patch) -> Optional[Fox]:
+      """Reproduction method for the Fox class."""
       return super().reproduce(newborn_patch, Fox.reproduction_cost_rate)  
 
    def same_species_in(self, patch: Patch) -> bool:
+      """Checks if there are any foxes in the given patch."""
       return patch.has_alive_fox()
       
    def predators_in(self, patch: Patch) -> bool:
@@ -204,13 +209,16 @@ class Rabbit(Animal):
       super().__init__(pop, patch, energy, age)
 
    def was_killed(self) -> bool:
+      """Returns whether or not the rabbit was killed by a predator"""
       return self._killed
 
    def kill(self):
+      """Kills the rabbit and removes it from the patch."""
       self._killed = True
       self._patch.remove(self)
 
    def is_alive(self) -> bool:
+      """Returns whether the given animal is alive. See 'is_alive()' of parent 'Animal'."""
       return super().is_alive() and not self._killed
    
    def feed(self):
@@ -232,10 +240,13 @@ class Rabbit(Animal):
          self._energy += food_amount # int + int = int
 
    def reproduce(self, newborn_patch: Patch) -> Optional[Rabbit]:
+      """Reproduction method for the Rabbit class."""
       return super().reproduce(newborn_patch, Rabbit.reproduction_cost_rate)
 
    def same_species_in(self, patch: Patch) -> bool:
+      """Checks if there are any rabbits in the given patch."""
       return patch.has_alive_rabbit()
 
    def predators_in(self, patch: Patch) -> bool:
+      """Checks if there are any foxes in the given patch."""
       return patch.has_alive_fox()
