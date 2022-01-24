@@ -6,11 +6,8 @@ import results
 from typing import Union, List, Tuple
 
 
-
-def run(parameters):
-    """
-    Run the simulation given parameters and returns data collected.
-    """
+def run(parameters: pars.Simulation) -> results.SimulationStats:
+    """Runs the simulation given the given parameters and returns a """
     patches = []
     sim_step = 0
     all_dead = False
@@ -20,25 +17,23 @@ def run(parameters):
         stats.kills_per_patch.append([])
         for y in range(parameters.world.north_south_length):
             stats.kills_per_patch[x].append(0)
-    
-    for i in range(parameters.world.area()):
-        patches.append(entities.Patch(i % parameters.world.west_east_length, i // parameters.world.west_east_length))
+            patches.append(entities.Patch(x,y))
 
     def data_on_birth(animal):
         """Records every number of living members of each species upon birth."""
-        if type(animal) is entities.Fox:
+        if isinstance(animal, entities.Fox):
             stats.foxes.total += 1
         else:
             stats.rabbits.total += 1
         
 
-    def init_animals(animal_entity: type(entities.Animal), pop_parameters: pars.Population):
+    def init_animals(animal_entity: entities.Animal, pop_parameters: pars.Population):
         """"Adds the initial population to random patches of grass in the world."""
         counter = 0
         while counter < pop_parameters.initial_size:
             index = random.randint(0, len(patches) - 1) # Choose a random patch
             
-            if len(patches[index].animals()) == 0 or len(patches[index].animals()) == 1 and type(patches[index].animals()[0]) is not animal_entity:
+            if len(patches[index].animals()) == 0 or len(patches[index].animals()) == 1 and isinstance(patches[index].animals()[0], animal_entity):
                 # If the patch is empty, or if there is another animal but it isn't of the same type, add the animal.
                 patches[index].add(animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age)))
                 data_on_birth(animal_entity)
@@ -47,7 +42,7 @@ def run(parameters):
 
     def data_on_death(animal):
         """Updates results class with data upon death of animal entities."""
-        if type(animal) == entities.Fox:
+        if isinstance(animal, entities.Fox):
             popStats = stats.foxes
         else:
             popStats = stats.rabbits
@@ -57,7 +52,7 @@ def run(parameters):
         ### CAUSE OF DEATH
         if animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
                 popStats.dead_by_starvation += 1
-        elif type(animal) == entities.Rabbit and animal.was_killed(): # Only occurs for rabbits
+        elif isinstance(animal, entities.Rabbit) and animal.was_killed(): # Only occurs for rabbits
             popStats.dead_by_predation += 1
             coords = animal.patch().coordinates()
             stats.kills_per_patch[coords[0]][coords[1]] += 1
@@ -67,7 +62,7 @@ def run(parameters):
         
 
 
-    def get_legal_move(current_patch: type(entities.Patch), moving_animal: type(entities.Animal), is_reproducing: bool = False) -> Union[entities.Patch, None]:
+    def get_legal_move(current_patch: entities.Patch, moving_animal: entities.Animal, is_reproducing: bool = False) -> Union[entities.Patch, None]:
         """Checks if surrounding tiles are valid for movement and/or reproduction."""
         all_moves = []
         legal_moves = []
@@ -92,7 +87,10 @@ def run(parameters):
             all_moves = [move for move in all_moves if move in legal_moves]
             
 
-        index_from_coords = lambda x,y: x + parameters.world.west_east_length * y #Gets index from x and y value
+        def index_from_coords(x: int, y: int) -> int:
+            """Gets the index from a patch's coordinates."""
+            return x + parameters.world.west_east_length * y
+        #index_from_coords = lambda x,y: x + parameters.world.west_east_length * y #Gets index from x and y value
         
         for i in range(len(all_moves)):
             potential_patch = patches[index_from_coords(*all_moves[i])]
@@ -123,6 +121,7 @@ def run(parameters):
     
     ### SIMULATION
     while sim_step < parameters.execution.max_steps and not all_dead:
+        # Initializing variables per step of simulation
         stats.avg_energy_per_step.append(0)
         stats.rabbits.avg_energy_per_step.append(0)
         stats.foxes.avg_energy_per_step.append(0)
@@ -130,15 +129,15 @@ def run(parameters):
         stats.foxes.size_per_step.append(0)
         alive_foxes = 0
         alive_rabbits = 0
-        all_dead = True
+        all_dead = True # Used to stop the simulation if all animals die
         
-        for patch in patches:
-            patch.tick()
+        for patch in patches: # For every patch
+            patch.tick() # Grass grows
             if len(patch.animals()) > 0:
                 for animal in patch.animals():
                     if animal.is_alive():
-                        all_dead = False
-                        animal.tick()
+                        all_dead = False # At least one
+                        animal.tick() # Animal ages/starves
 
                         if animal.predators_in(animal.patch()):
                             animal.kill() #Kill bunny if starting turn on fox square
@@ -152,15 +151,16 @@ def run(parameters):
                         if animal.can_reproduce():
                             baby_patch = get_legal_move(animal.patch(), animal, True)
                             if baby_patch is not None:
-                                animal.reproduce(baby_patch)
-                                data_on_birth(animal) # Note that we can pass animal as we only need its type
+                                baby = animal.reproduce(baby_patch)
+                                if baby is not None:
+                                    data_on_birth(baby)
                                 
                         elif animal.is_alive():
                             new_patch = get_legal_move(animal.patch(), animal)
                             if new_patch is not None:
                                 animal.move_to(new_patch)
 
-                            if type(animal) ==  entities.Fox:
+                            if isinstance(animal, entities.Fox):
                                 stats.foxes.size_per_step[sim_step] += 1
                                 stats.foxes.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_foxes += 1
