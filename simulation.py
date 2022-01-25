@@ -3,7 +3,7 @@ import entities
 import visualiser as vis
 import parameters as pars
 import results
-from typing import Union, List, Tuple
+from typing import List, Tuple, Optional
 
 
 def run(parameters: pars.Simulation) -> results.SimulationStats:
@@ -63,7 +63,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
             popStats.dead_by_starvation += 1        
 
 
-    def get_legal_move(moving_animal: entities.Animal, is_reproducing: bool = False) -> Union[entities.Patch, None]:
+    def get_legal_move(moving_animal: entities.Animal, is_reproducing: bool = False) -> Optional[entities.Patch]:
         """Checks if surrounding tiles are valid for movement and/or reproduction."""
         all_moves = []
         legal_moves = []
@@ -144,12 +144,12 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                             data_on_death(animal)
 
                         elif len(animal.patch().animals()) == 2: # If rabbit and fox on square
-                          if isinstance(animal.patch.animals()[0], entities.Fox):
-                              predator = animal.patch.animals()[0]
-                              prey = animal.patch.animals()[1]
+                          if isinstance(patch.animals()[0], entities.Fox):
+                              predator = patch.animals()[0]
+                              prey = patch.animals()[1]
                           else:
-                              predator = animal.patch.animals()[1]
-                              prey = animal.patch.animals()[0]
+                              predator = patch.animals()[1]
+                              prey = patch.animals()[0]
                           predator.feed()
                           prey.kill()
                           data_on_death(prey)
