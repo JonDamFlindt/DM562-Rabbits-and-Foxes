@@ -20,7 +20,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
             stats.kills_per_patch[x].append(0)
             patches.append(entities.Patch(x,y))
 
-    def data_on_birth(animal):
+    def data_on_birth(animal: entities.Animal):
         """Records every number of living members of each species upon birth."""
         if isinstance(animal, entities.Fox):
             stats.foxes.total += 1
@@ -34,33 +34,33 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         while counter < pop_parameters.initial_size:
             index = random.randint(0, len(patches) - 1) # Choose a random patch
             
-            if len(patches[index].animals()) == 0 or len(patches[index].animals()) == 1 and not isinstance(patches[index].animals()[0], animal_entity):
+            if len(patches[index].animals()) == 0 or (len(patches[index].animals()) == 1 and not isinstance(patches[index].animals()[0], animal_entity)):
                 # If the patch is empty, or if there is another animal but it isn't of the same type, add the animal.
                 animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age))
                 data_on_birth(animal_entity)
                 counter += 1
 
 
-    def data_on_death(animal):
+    def data_on_death(animal: entities.Animal):
         """Updates results class with data upon death of animal entities."""
         if isinstance(animal, entities.Fox):
             popStats = stats.foxes
+            pop_max_age = parameters.foxes.max_age
         else:
             popStats = stats.rabbits
+            pop_max_age = parameters.rabbits.max_age
 
         popStats.age_at_death.append(animal.age())
 
         ### CAUSE OF DEATH
-        if animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
-                popStats.dead_by_starvation += 1
+        if animal.age() >= pop_max_age:
+            popStats.dead_by_old_age += 1
         elif isinstance(animal, entities.Rabbit) and animal.was_killed(): # Only occurs for rabbits
             popStats.dead_by_predation += 1
             coords = animal.patch().coordinates()
             stats.kills_per_patch[coords[0]][coords[1]] += 1
-            
-        else: # Since we cannot get the species parameters from the animal and this is the last possible scenario, else.
-            popStats.dead_by_old_age += 1
-        
+        elif animal.energy() <= 0: # Not enough food; mainly an issue for wolves.
+            popStats.dead_by_starvation += 1        
 
 
     def get_legal_move(current_patch: entities.Patch, moving_animal: entities.Animal, is_reproducing: bool = False) -> Union[entities.Patch, None]:
@@ -146,9 +146,11 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                           for entity in animal.patch().animals():
                             if isinstance(animal, entities.Fox) and isinstance(entity, entities.Rabbit) and entity.is_alive():
                               animal.feed()
+                              entity.kill()
                               data_on_death(entity)
                             elif isinstance(animal, entities.Rabbit) and isinstance(entity, entities.Fox) and animal.is_alive():
                               entity.feed()
+                              animal.kill()
                               data_on_death(animal)
                         elif isinstance(animal, entities.Rabbit):
                             animal.feed() #Otherwise rabbits eat
