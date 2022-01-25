@@ -15,7 +15,7 @@ class Patch:
    
    def __init__(self, x: int, y: int):
       self._coords = (x,y)
-      self.__Animals = []
+      self._Animals = []
       self._grass = random_percentage(Patch.max_grass_amount)
       
    def coordinates(self) -> Tuple[int, int]:
@@ -26,9 +26,13 @@ class Patch:
       """Returns the amount of grass on the patch."""
       return self._grass
 
-   def animals(self) -> list:
-      return self.__Animals
 
+   def animals(self) -> list:
+      """Returns a list"""
+      copy = self._Animals
+      return copy
+
+   
    def tick(self):
       """
       Progresses time for the patch in the simulation.
@@ -41,8 +45,8 @@ class Patch:
       """ Auxiliary method for checking if an animal type on a given patch is alive. """
       alive = False
       i = 0
-      while i < len(self.__Animals) and not alive:
-         if self.__Animals[i].is_alive() and isinstance(self.__Animals[i], animal_class):
+      while i < len(self._Animals) and not alive:
+         if self._Animals[i].is_alive() and isinstance(self._Animals[i], animal_class):
             alive = True
          else:
             i += 1
@@ -60,14 +64,14 @@ class Patch:
       """
       Adds the given animal to the patch
       """
-      self.__Animals.append(animal)
+      self._Animals.append(animal)
 
    def remove(self, animal: Animal):
       """
       Removes the given animal from the patch, if it is on the patch.
       """
       try:
-         self.__Animals.remove(animal)
+         self._Animals.remove(animal)
       except ValueError:
          pass
 
@@ -167,12 +171,12 @@ class Fox(Animal):
          food = False
          i = 0
          while not food: # i  cannot go out of index, since we know there is a rabbit.
-            if type(self._patch.__Animals[i]).__name__ == "Rabbit" and self._patch.__Animals[i].is_alive():
+            if isinstance(self._patch._Animals[i], Rabbit) and self._patch._Animals[i].is_alive():
                food = True
             else:
                i += 1
 
-         self._patch.__Animals[i].kill() # Kill the rabbit
+         self._patch._Animals[i].kill() # Kill the rabbit
          self._energy += self.food_energy_per_unit
          if self._energy > self._pop.max_energy:
             self._energy = self._pop.max_energy
@@ -250,3 +254,6 @@ class Rabbit(Animal):
    def predators_in(self, patch: Patch) -> bool:
       """Checks if there are any foxes in the given patch."""
       return patch.has_alive_fox()
+
+
+
