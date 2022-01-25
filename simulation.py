@@ -63,11 +63,11 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
             popStats.dead_by_starvation += 1        
 
 
-    def get_legal_move(current_patch: entities.Patch, moving_animal: entities.Animal, is_reproducing: bool = False) -> Union[entities.Patch, None]:
+    def get_legal_move(moving_animal: entities.Animal, is_reproducing: bool = False) -> Union[entities.Patch, None]:
         """Checks if surrounding tiles are valid for movement and/or reproduction."""
         all_moves = []
         legal_moves = []
-        coords = list(current_patch.coordinates())
+        coords = list(moving_animal.patch().coordinates())
         
         all_moves.append([coords[0], coords[1] - 1]) # Up
         all_moves.append([coords[0], coords[1] + 1]) # Down
@@ -157,7 +157,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                             animal.feed() #Otherwise rabbits eat
                         
     
-                        new_patch = get_legal_move(animal.patch(), animal) # For movement in case reproduction does not occur
+                        new_patch = get_legal_move(animal) # For movement in case reproduction does not occur
                         if animal.can_reproduce():
                             baby_patch = get_legal_move(animal.patch(), animal, True)
                             if baby_patch is not None:
