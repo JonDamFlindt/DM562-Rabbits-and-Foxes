@@ -103,7 +103,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         if legal_moves == []:
             move = None
         else:
-            move = patches[index_from_coords(*random.sample(legal_moves,1))]
+            move = patches[index_from_coords(*random.sample(legal_moves,1)[0])]
             moved_this_turn.append(moving_animal)
         
         return move
