@@ -146,11 +146,9 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                           for entity in animal.patch().animals():
                             if isinstance(animal, entities.Fox) and isinstance(entity, entities.Rabbit) and entity.is_alive():
                               animal.feed()
-                              entity.kill()
                               data_on_death(entity)
                             elif isinstance(animal, entities.Rabbit) and isinstance(entity, entities.Fox) and animal.is_alive():
                               entity.feed()
-                              animal.kill()
                               data_on_death(animal)
                         elif isinstance(animal, entities.Rabbit):
                             animal.feed() #Otherwise rabbits eat
