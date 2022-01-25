@@ -144,15 +144,15 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                             data_on_death(animal)
 
                         elif len(animal.patch().animals()) == 2: # If rabbit and fox on square
-                          for entity in animal.patch().animals():
-                            if isinstance(animal, entities.Fox) and isinstance(entity, entities.Rabbit) and entity.is_alive():
-                              animal.feed()
-                              entity.kill()
-                              data_on_death(entity)
-                            elif isinstance(animal, entities.Rabbit) and isinstance(entity, entities.Fox) and animal.is_alive():
-                              entity.feed()
-                              animal.kill()
-                              data_on_death(animal)
+                          if isinstance(animal.patch.animals()[0], entities.Fox):
+                              predator = animal.patch.animals()[0]
+                              prey = animal.patch.animals()[1]
+                          else:
+                              predator = animal.patch.animals()[1]
+                              prey = animal.patch.animals()[0]
+                          predator.feed()
+                          prey.kill()
+                          data_on_death(prey)
                         elif isinstance(animal, entities.Rabbit):
                             animal.feed() #Otherwise rabbits eat
                         
