@@ -159,7 +159,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
     
                         new_patch = get_legal_move(animal) # For movement in case reproduction does not occur
                         if animal.can_reproduce():
-                            baby_patch = get_legal_move(animal.patch(), animal, True)
+                            baby_patch = get_legal_move(animal, True)
                             if baby_patch is not None:
                                 baby = animal.reproduce(baby_patch)
                                 if baby is not None:
