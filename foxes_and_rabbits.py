@@ -69,7 +69,7 @@ def int_input(user_msg: str, lower_limit: int, upper_limit: int) -> int:
   """Input method for parameters of integer values."""
   user = 'spam'
   while not user.isdigit() or not lower_limit <= int(user) <= upper_limit:  
-    user = _user_input(user_msg + f" (between {lower_limit} and {upper_limit}): ")
+    user = _user_input(user_msg + f" (between {lower_limit} and {upper_limit})")
     if not user.isdigit() or not lower_limit <= int(user) <= upper_limit:
       print(f"Input must be an integer between {lower_limit} and {upper_limit}, try again.")
   return int(user)
@@ -89,9 +89,9 @@ def float_input(user_msg: str) -> float:
 def update_animal(animal: parameters.Population) -> None:
   """Function used to update population parameters for the animals of the simulation."""
   animal.initial_size = int_input('Please enter an initial size of the population', 0, params.world.area())
-  animal.max_age = int_input('Please enter the max age for the population', 0, sys.maxsize)
-  animal.max_energy = int_input('Please enter the maximum amount of energy that a member of the population can attain', 0, sys.maxsize)
-  animal.metabolism = int_input('Please enter the metabolism of the population', 1, sys.maxsize)
+  animal.max_age = int_input('Please enter the max age for the population', 0, 500)
+  animal.max_energy = int_input('Please enter the maximum amount of energy that a member of the population can attain', 0, 100)
+  animal.metabolism = int_input('Please enter the metabolism of the population', 1, 100)
   animal.reproduction_probability = float_input('Please enter the reproduction probability of the population as a percentage between 0 and 1')
   animal.reproduction_min_age = int_input('Please enter the minimum age for reproduction for the population', 0, animal.max_age)
   animal.reproduction_min_energy = int_input('Please enter the minimum required energy for reproduction', 0, animal.max_energy)
@@ -99,7 +99,7 @@ def update_animal(animal: parameters.Population) -> None:
 
 def set_execution() -> None:
   """Used to update the execution settings for the simulation."""
-  params.execution.max_steps = int_input('Please enter the maximum amount of simulation steps', 0, sys.maxsize)
+  params.execution.max_steps = int_input('Please enter the maximum amount of simulation steps', 1, round(sys.maxsize**(1/4)/1000)*1000)
   params.execution.batch = bool_input('batch', 'visual', 'Please choose a simulation mode')
 
 state = None # Initalize variable
@@ -120,10 +120,10 @@ while state != start_menu[-1]: #As long as not "quit"
 
   elif state == start_menu[1]: #Quick 
     # Assigns new values to the simulation
-    params.world.north_south_length = int_input('Please enter a north/south length for the world', 1, sys.maxsize)
-    params.world.west_east_length = int_input('Please enter a west/east length for the world', 1, sys.maxsize)
-    params.rabbits.initial_size = int_input('Please enter an initial size of the population', 0, params.world.area())
-    params.foxes.initial_size = int_input('Please enter an initial size of the population', 0, params.world.area())
+    params.world.north_south_length = int_input('Please enter a north/south length for the world', 1, 500)
+    params.world.west_east_length = int_input('Please enter a west/east length for the world', 1, 500)
+    params.rabbits.initial_size = int_input('Please enter an initial size of the rabbit population', 0, params.world.area())
+    params.foxes.initial_size = int_input('Please enter an initial size of the fox population', 0, params.world.area())
     set_execution()
 
     print()
@@ -135,8 +135,8 @@ while state != start_menu[-1]: #As long as not "quit"
       state = menu(advanced_menu)
       if state == advanced_menu[0]: #World
         params.world.is_toroid = bool_input('loop','walls', 'Should the world loop or have walls?')
-        params.world.north_south_length = int_input('Please enter a north/south length for the world', 1, sys.maxsize)
-        params.world.west_east_length = int_input('Please enter a west/east length for the world', 1, sys.maxsize)
+        params.world.north_south_length = int_input('Please enter a north/south length for the world', 1, 500)
+        params.world.west_east_length = int_input('Please enter a west/east length for the world', 1, 500)
         
       elif state == advanced_menu[1]: #Rabbit population
         update_animal(params.rabbits)
