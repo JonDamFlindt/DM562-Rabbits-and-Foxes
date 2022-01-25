@@ -159,7 +159,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
     
                         new_patch = get_legal_move(animal) # For movement in case reproduction does not occur
                         if animal.can_reproduce():
-                            baby_patch = get_legal_move(animal, True)
+                            baby_patch = get_legal_move(animal.patch(), animal, True)
                             if baby_patch is not None:
                                 baby = animal.reproduce(baby_patch)
                                 if baby is not None:
@@ -172,6 +172,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                             if new_patch is not None:
                                 animal.move_to(new_patch)
 
+                            moved_this_turn.append(animal)
                             if isinstance(animal, entities.Fox):
                                 stats.foxes.size_per_step[sim_step] += 1
                                 stats.foxes.avg_energy_per_step[sim_step] += animal.energy()
@@ -181,7 +182,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                                 stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_rabbits += 1
 
-            
+
         if alive_foxes > 0 or alive_rabbits > 0:
             stats.avg_energy_per_step[sim_step] = (stats.foxes.avg_energy_per_step[sim_step] + stats.rabbits.avg_energy_per_step[sim_step]) / (alive_foxes + alive_rabbits)
             if alive_foxes > 0:
