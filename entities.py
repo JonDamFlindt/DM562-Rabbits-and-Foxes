@@ -60,7 +60,8 @@ class Patch:
       """
       Adds the given animal to the patch
       """
-      self._Animals.append(animal)
+      if animal not in self._Animals:
+         self._Animals.append(animal)
 
    def remove(self, animal: Animal):
       """
