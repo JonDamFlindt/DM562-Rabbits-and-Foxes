@@ -4,9 +4,7 @@ import parameters
 import random
 from typing import Type, Tuple, Optional
 
-def random_percentage(variable_max):
-   """Returns a random percentage between 0 and a variable's maximum value."""
-   return round(random.uniform(0,1) * variable_max)
+
 
 class Patch:
    min_grass_growth = 1
@@ -16,7 +14,7 @@ class Patch:
    def __init__(self, x: int, y: int):
       self._coords = (x,y)
       self._Animals = []
-      self._grass = random_percentage(Patch.max_grass_amount)
+      self._grass = round(random.uniform(0,1) * Patch.max_grass_amount)
       
    def coordinates(self) -> Tuple[int, int]:
       """Returns the coordinates of the given patch."""
@@ -26,12 +24,10 @@ class Patch:
       """Returns the amount of grass on the patch."""
       return self._grass
 
-
    def animals(self) -> list:
-      """Returns a list"""
+      """Returns a list of the animals on the patch."""
       copy = self._Animals
       return copy
-
    
    def tick(self):
       """
@@ -145,9 +141,10 @@ class Animal:
          newborn = self.__class__(self._pop, newborn_patch, 0) # The "clever!" line.
          self._energy -= self._pop.reproduction_min_energy * rep_cost_rate
          newborn_patch.add(newborn)
-         return newborn
+         baby = newborn
       else:
-         return None
+         baby = None
+      return baby
 
 
 class Fox(Animal):
@@ -175,6 +172,7 @@ class Fox(Animal):
                food = True
             else:
                i += 1
+         
 
          self._patch._Animals[i].kill() # Kill the rabbit
          self._energy += self.food_energy_per_unit
@@ -254,6 +252,3 @@ class Rabbit(Animal):
    def predators_in(self, patch: Patch) -> bool:
       """Checks if there are any foxes in the given patch."""
       return patch.has_alive_fox()
-
-
-
