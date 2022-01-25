@@ -46,7 +46,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         if isinstance(animal, entities.Fox):
             popStats = stats.foxes
             pop_max_age = parameters.foxes.max_age
-        else:
+        elif isinstance(animal, entities.Rabbit):
             popStats = stats.rabbits
             pop_max_age = parameters.rabbits.max_age
 
@@ -140,9 +140,10 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                     if animal.is_alive() and animal not in moved_this_turn:
                         all_dead = False # At least one
                         animal.tick() # Animal ages/starves
+                        if not animal.is_alive(): #If dead, update death data
+                            data_on_death(animal)
 
-
-                        if len(animal.patch().animals()) == 2 and animal.is_alive(): # If rabbit and fox on square
+                        elif len(animal.patch().animals()) == 2: # If rabbit and fox on square
                           for entity in animal.patch().animals():
                             if isinstance(animal, entities.Fox) and isinstance(entity, entities.Rabbit) and entity.is_alive():
                               animal.feed()
@@ -154,9 +155,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                               data_on_death(animal)
                         elif isinstance(animal, entities.Rabbit):
                             animal.feed() #Otherwise rabbits eat
-
-                        elif not animal.is_alive(): #If dead, update death data
-                            data_on_death(animal)
+                        
     
                         new_patch = get_legal_move(animal.patch(), animal) # For movement in case reproduction does not occur
                         if animal.can_reproduce():
