@@ -75,12 +75,12 @@ def int_input(user_msg: str, lower_limit: int, upper_limit: int) -> int:
   return int(user)
 
 
-def float_input(user_msg: str) -> float:
+def float_input() -> float:
   """Input method for parameters of floating point values."""
   user = 'spam'
   while not user.replace('.','',1).isdigit() or not 0 <= float(user) <= 1:
     # Between 0 and 1 since this is only used for reproduction  
-    user = _user_input(user_msg)
+    user = _user_input('Please enter the reproduction probability of the population as a percentage between 0 and 1')
     if not user.replace('.','',1).isdigit() or not 0 <= float(user) <= 1:
       print(f"Input must be a decimal number (float) between 0 and 1 (i.e. a percentage), try again.")
   return float(user)
@@ -92,7 +92,7 @@ def update_animal(animal: parameters.Population) -> None:
   animal.max_age = int_input('Please enter the max age for the population', 0, 500)
   animal.max_energy = int_input('Please enter the maximum amount of energy that a member of the population can attain', 0, 100)
   animal.metabolism = int_input('Please enter the metabolism of the population', 1, 100)
-  animal.reproduction_probability = float_input('Please enter the reproduction probability of the population as a percentage between 0 and 1')
+  animal.reproduction_probability = float_input()
   animal.reproduction_min_age = int_input('Please enter the minimum age for reproduction for the population', 0, animal.max_age)
   animal.reproduction_min_energy = int_input('Please enter the minimum required energy for reproduction', 0, animal.max_energy)
 
