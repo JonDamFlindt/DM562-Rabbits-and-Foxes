@@ -11,6 +11,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
     patches = []
     sim_step = 0
     all_dead = False
+    moved_this_turn = [] # Used to make the animals only move once
     stats = results.SimulationStats()
 
     for x in range(parameters.world.west_east_length):
@@ -103,6 +104,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
             move = None
         else:
             move = patches[index_from_coords(*random.sample(legal_moves,1))]
+            moved_this_turn.append(moving_animal)
         
         return move
 
@@ -129,21 +131,31 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         alive_foxes = 0
         alive_rabbits = 0
         all_dead = True # Used to stop the simulation if all animals die
+        moved_this_turn = [] # Used to make the animals only move once
         
         for patch in patches: # For every patch
             patch.tick() # Grass grows
             if len(patch.animals()) > 0:
                 for animal in patch.animals():
-                    if animal.is_alive():
+                    if animal.is_alive() and animal not in moved_this_turn:
                         all_dead = False # At least one
                         animal.tick() # Animal ages/starves
 
-                        if animal.predators_in(animal.patch()):
-                            animal.kill() #Kill bunny if starting turn on fox square
-                        else:
-                            animal.feed() #Otherwise eat
 
-                        if not animal.is_alive(): #If dead, update death data
+                        if len(animal.patch().animals()) == 2 and animal.is_alive(): # If rabbit and fox on square
+                          for entity in animal.patch().animals():
+                            if isinstance(animal, entities.Fox) and isinstance(entity, entities.Rabbit) and entity.is_alive():
+                              animal.feed()
+                              entity.kill()
+                              data_on_death(entity)
+                            elif isinstance(animal, entities.Rabbit) and isinstance(entity, entities.Fox) and animal.is_alive():
+                              entity.feed()
+                              animal.kill()
+                              data_on_death(animal)
+                        elif isinstance(animal, entities.Rabbit):
+                            animal.feed() #Otherwise rabbits eat
+
+                        elif not animal.is_alive(): #If dead, update death data
                             data_on_death(animal)
     
                         new_patch = get_legal_move(animal.patch(), animal) # For movement in case reproduction does not occur
@@ -153,8 +165,9 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                                 baby = animal.reproduce(baby_patch)
                                 if baby is not None:
                                     data_on_birth(baby)
-                            else:
+                            elif new_patch is not None:
                                 animal.move_to(new_patch)
+                                
                                 
                         elif animal.is_alive(): #Only if the animal is alive and cannot reproduce
                             if new_patch is not None:
