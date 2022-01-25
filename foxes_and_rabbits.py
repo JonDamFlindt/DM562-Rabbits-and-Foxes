@@ -67,18 +67,18 @@ def bool_input(true_option: str, false_option: str, msg: str) -> bool:
 
 def int_input(user_msg: str, lower_limit: int, upper_limit: int) -> int:
   """Input method for parameters of integer values."""
-  user = None
-  while not user.isdigit() and lower_limit <= int(user) <= upper_limit:  
+  user = 'spam'
+  while not user.isdigit() or not lower_limit <= int(user) <= upper_limit:  
     user = _user_input(user_msg + f" (between {lower_limit} and {upper_limit}): ")
     if not user.isdigit() or not lower_limit <= int(user) <= upper_limit:
       print(f"Input must be an integer between {lower_limit} and {upper_limit}, try again.")
   return int(user)
 
 
-def float_input(user_input: str) -> float:
+def float_input(user_msg: str) -> float:
   """Input method for parameters of floating point values."""
   user = 'spam'
-  while not user.replace('.','',1).isdigit() and 0 <= float(user) <= 1:
+  while not user.replace('.','',1).isdigit() or not 0 <= float(user) <= 1:
     # Between 0 and 1 since this is only used for reproduction  
     user = _user_input(user_msg)
     if not user.replace('.','',1).isdigit() or not 0 <= float(user) <= 1:
@@ -93,8 +93,8 @@ def update_animal(animal: parameters.Population) -> None:
   animal.max_energy = int_input('Please enter the maximum amount of energy that a member of the population can attain', 0, sys.maxsize)
   animal.metabolism = int_input('Please enter the metabolism of the population', 1, sys.maxsize)
   animal.reproduction_probability = float_input('Please enter the reproduction probability of the population as a percentage between 0 and 1')
-  animal.reproduction_min_age = int_input('Please enter the minimum age for reproduction for the population', 0, animal.max_age())
-  animal.reproduction_min_energy = int_input('Please enter the minimum required energy for reproduction', 0, animal.max_energy())
+  animal.reproduction_min_age = int_input('Please enter the minimum age for reproduction for the population', 0, animal.max_age)
+  animal.reproduction_min_energy = int_input('Please enter the minimum required energy for reproduction', 0, animal.max_energy)
 
 
 def set_execution() -> None:
