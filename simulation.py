@@ -33,9 +33,9 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         while counter < pop_parameters.initial_size:
             index = random.randint(0, len(patches) - 1) # Choose a random patch
             
-            if len(patches[index].animals()) == 0 or len(patches[index].animals()) == 1 and isinstance(patches[index].animals()[0], animal_entity):
+            if len(patches[index].animals()) <= 1 and isinstance(patches[index].animals()[0], animal_entity):
                 # If the patch is empty, or if there is another animal but it isn't of the same type, add the animal.
-                patches[index].add(animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age)))
+                animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age)))
                 data_on_birth(animal_entity)
                 counter += 1
 
@@ -90,7 +90,6 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         def index_from_coords(x: int, y: int) -> int:
             """Gets the index from a patch's coordinates."""
             return x + parameters.world.west_east_length * y
-        #index_from_coords = lambda x,y: x + parameters.world.west_east_length * y #Gets index from x and y value
         
         for i in range(len(all_moves)):
             potential_patch = patches[index_from_coords(*all_moves[i])]
@@ -103,7 +102,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
         if legal_moves == []:
             move = None
         else:
-            move = patches[index_from_coords(*random.choice(legal_moves))]
+            move = patches[index_from_coords(*random.sample(legal_moves,1))]
         
         return move
 
@@ -147,16 +146,17 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                         if not animal.is_alive(): #If dead, update death data
                             data_on_death(animal)
     
-                        
+                        new_patch = get_legal_move(animal.patch(), animal) # For movement in case reproduction does not occur
                         if animal.can_reproduce():
                             baby_patch = get_legal_move(animal.patch(), animal, True)
                             if baby_patch is not None:
                                 baby = animal.reproduce(baby_patch)
                                 if baby is not None:
                                     data_on_birth(baby)
+                            else:
+                                animal.move_to(new_patch)
                                 
                         elif animal.is_alive(): #Only if the animal is alive and cannot reproduce
-                            new_patch = get_legal_move(animal.patch(), animal)
                             if new_patch is not None:
                                 animal.move_to(new_patch)
 
@@ -164,7 +164,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                                 stats.foxes.size_per_step[sim_step] += 1
                                 stats.foxes.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_foxes += 1
-                            elif isinstance(animal, entities.Rabbits):
+                            elif isinstance(animal, entities.Rabbit):
                                 stats.rabbits.size_per_step[sim_step] += 1
                                 stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_rabbits += 1
