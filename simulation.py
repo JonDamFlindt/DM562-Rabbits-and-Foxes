@@ -7,7 +7,7 @@ from typing import Union, List, Tuple
 
 
 def run(parameters: pars.Simulation) -> results.SimulationStats:
-    """Runs the simulation given the given parameters and returns a """
+    """Runs the simulation given the given parameters and returns a SimulationStats object."""
     patches = []
     sim_step = 0
     all_dead = False
