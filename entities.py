@@ -84,6 +84,7 @@ class Animal:
       self._age = age
       self._energy = energy
       self._patch = patch
+      self._patch.add(self)
 
    def age(self) -> int:
       """ Returns the animal's current age."""
@@ -112,8 +113,7 @@ class Animal:
       """
       self._age += 1
       self._energy -= self._pop.metabolism
-      if self.age() >= self._pop.max_age or self.energy() <= 0:
-         self._energy = 0
+      if self._age >= self._pop.max_age or self._energy <= 0:
          self._alive = False
          self._patch.remove(self)         
 
