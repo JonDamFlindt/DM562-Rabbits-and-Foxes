@@ -36,7 +36,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
             
             if len(patches[index].animals()) <= 1 and isinstance(patches[index].animals()[0], animal_entity):
                 # If the patch is empty, or if there is another animal but it isn't of the same type, add the animal.
-                animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age)))
+                animal_entity(pop_parameters, patches[index], random.randint(0, pop_parameters.max_age))
                 data_on_birth(animal_entity)
                 counter += 1
 
