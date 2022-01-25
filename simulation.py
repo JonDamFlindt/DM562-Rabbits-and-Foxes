@@ -155,7 +155,7 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                                 if baby is not None:
                                     data_on_birth(baby)
                                 
-                        elif animal.is_alive():
+                        elif animal.is_alive(): #Only if the animal is alive and cannot reproduce
                             new_patch = get_legal_move(animal.patch(), animal)
                             if new_patch is not None:
                                 animal.move_to(new_patch)
@@ -164,17 +164,18 @@ def run(parameters: pars.Simulation) -> results.SimulationStats:
                                 stats.foxes.size_per_step[sim_step] += 1
                                 stats.foxes.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_foxes += 1
-                            else:
+                            elif isinstance(animal, entities.Rabbits):
                                 stats.rabbits.size_per_step[sim_step] += 1
                                 stats.rabbits.avg_energy_per_step[sim_step] += animal.energy()
                                 alive_rabbits += 1
 
             
-        stats.avg_energy_per_step[sim_step] = (stats.foxes.avg_energy_per_step[sim_step] + stats.rabbits.avg_energy_per_step[sim_step]) / (alive_foxes + alive_rabbits)
-        if alive_foxes > 0:
-            stats.foxes.avg_energy_per_step[sim_step] /= alive_foxes
-        if alive_rabbits > 0:
-            stats.rabbits.avg_energy_per_step[sim_step] /= alive_rabbits
+        if alive_foxes > 0 or alive_rabbits > 0:
+            stats.avg_energy_per_step[sim_step] = (stats.foxes.avg_energy_per_step[sim_step] + stats.rabbits.avg_energy_per_step[sim_step]) / (alive_foxes + alive_rabbits)
+            if alive_foxes > 0:
+                stats.foxes.avg_energy_per_step[sim_step] /= alive_foxes
+            if alive_rabbits > 0:
+                stats.rabbits.avg_energy_per_step[sim_step] /= alive_rabbits
         
         world.update(sim_step)
         sim_step += 1
